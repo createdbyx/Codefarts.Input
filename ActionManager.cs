@@ -17,6 +17,7 @@ namespace Codefarts.Input
 #if UNITY_5
     using UnityEngine;
     using Codefarts.Core;         
+    using Codefarts.Input.Code;
 #endif
 
 #if XNA
@@ -67,7 +68,7 @@ namespace Codefarts.Input
                     lock (lockObject)
                     {
                         singleton = new ActionManager();
-#if UNITY3D
+#if UNITY_5
                         // TODO: need setting here to specify the object name
 
                         // setup hidden game object that will be used for updating agent behaviors

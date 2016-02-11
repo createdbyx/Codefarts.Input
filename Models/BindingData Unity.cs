@@ -1,4 +1,4 @@
-﻿#if UNITY_5
+﻿#if UNITY_5 || PORTABLE
 /*
 <copyright>
 Copyright (c) 2012 Codefarts
@@ -31,5 +31,5 @@ namespace Codefarts.Input.Models
         /// </summary>
         public bool AlwaysRaise { get; set; }
     }
-} 
+}
 #endif
