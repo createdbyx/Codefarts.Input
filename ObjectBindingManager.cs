@@ -14,7 +14,7 @@ namespace Codefarts.Input
 
     using Codefarts.Input.Models;
 
-#if !UNITY3D && !PORTABLE
+#if XNA
     using Microsoft.Xna.Framework;
 #endif
 
@@ -55,7 +55,7 @@ namespace Codefarts.Input
                 throw new ArgumentNullException("manager");
             }
 
-#if !UNITY3D || !PORTABLE
+#if XNA
             this.CheckIUpdateable = true;
 #endif
             this.Manager = manager;
@@ -77,7 +77,7 @@ namespace Codefarts.Input
             }
         }
 
-#if !UNITY3D || !PORTABLE
+#if XNA
         /// <summary>
         /// Gets or sets a value indicating whether or not the bound object implements <see cref="IUpdateable"/>. Default is true.
         /// </summary>
@@ -430,7 +430,7 @@ namespace Codefarts.Input
                 var obj = list[index++];
                 if (obj != null)
                 {
-#if !UNITY3D && !PORTABLE
+#if XNA
                     if (this.CheckIUpdateable && obj is IUpdateable && ((IUpdateable)obj).Enabled == false)
                     {
                         continue;

@@ -14,13 +14,12 @@ namespace Codefarts.Input
 
     using Codefarts.Input.Interfaces;
 
-#if UNITY3D
+#if UNITY_5
     using UnityEngine;
-    using Codefarts.Core;
-    using Codefarts.Input.Code;
+    using Codefarts.Core;         
 #endif
 
-#if !UNITY3D && !PORTABLE
+#if XNA
     using Microsoft.Xna.Framework;
 #endif
 

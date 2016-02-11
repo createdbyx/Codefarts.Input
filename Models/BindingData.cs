@@ -9,14 +9,14 @@
 
 namespace Codefarts.Input.Models
 {
-#if !UNITY3D && !PORTABLE
+#if XNA
     using Microsoft.Xna.Framework.Content;
 #endif
 
     /// <summary>
     /// Provides a class for binding information.
     /// </summary>
-    public class BindingData
+    public partial class BindingData
     {
         /// <summary>
         /// Gets or sets the action name.
@@ -34,8 +34,7 @@ namespace Codefarts.Input.Models
         /// <remarks>This could also point to a device state such as a led light or gyroscope etc.</remarks>
         public string Source { get; set; }
 
-#if !UNITY3D && !PORTABLE
-
+#if XNA
         /// <summary>
         /// Gets or sets the player id.
         /// </summary>
@@ -53,25 +52,7 @@ namespace Codefarts.Input.Models
         /// Gets or sets a value indicating whether the <see cref="ActionManager"/> should raise an action event on every update.
         /// </summary>
         [ContentSerializer(Optional = true)]
-        public bool AlwaysRaise { get; set; }
-
-#else
-
-        /// <summary>
-        /// Gets or sets the player id.
-        /// </summary>
-        public int Player { get; set; }
-        
-        /// <summary>
-        /// Gets or sets the state to compare against.
-        /// </summary>
-        /// <remarks>This is only used for non axis sources like buttons or led states.</remarks>
-        public PressedState State { get; set; }
-      
-        /// <summary>
-        /// Gets or sets a value indicating whether the <see cref="ActionManager"/> should raise an action event on every update.
-        /// </summary>
-        public bool AlwaysRaise { get; set; }
+        public bool AlwaysRaise { get; set; }  
 #endif
     }
 }

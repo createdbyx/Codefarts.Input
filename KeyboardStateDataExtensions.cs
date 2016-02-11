@@ -20,7 +20,7 @@ namespace Codefarts.Input
 #if SILVERLIGHT
 using Keys = System.Windows.Input.Key;
 #endif
-#if UNITY3D
+#if UNITY_5
     using Keys = UnityEngine.KeyCode;
 #endif
 #if PORTABLE

@@ -13,7 +13,7 @@ namespace Codefarts.Input
 
     using Codefarts.Input.Interfaces;
 
-#if !UNITY3D && !PORTABLE
+#if XNA
     using Microsoft.Xna.Framework;
 #endif
 
@@ -116,7 +116,7 @@ namespace Codefarts.Input
         {
             get
             {
-#if !UNITY3D && !PORTABLE
+#if XNA
                 return this.Binder != null ? this.Binder.Player : (int)PlayerIndex.One; 
 #else
                 return this.Binder != null ? this.Binder.Player : 0;
