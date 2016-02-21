@@ -14,14 +14,11 @@ namespace Codefarts.Input
 
     using Codefarts.Input.Models;
 
-#if XNA
-    using Microsoft.Xna.Framework;
-#endif
 
     /// <summary>
     /// Used to pair actions with classes.
     /// </summary>
-    public class ObjectBindingManager : Dictionary<ActionKey, List<EventHandler<ActionArgs>>>
+    public class ObjectBindingManager : Dictionary<ActionKey, List<EventHandler<BindingData>>>
     {
         #region Constants and Fields
 
@@ -31,9 +28,9 @@ namespace Codefarts.Input
         private static ObjectBindingManager singleton;
 
         /// <summary>
-        /// Holds a reference to a <see cref="ActionManager"/>.
+        /// Holds a reference to a <see cref="InputManager"/>.
         /// </summary>
-        private ActionManager manager;
+        private InputManager manager;
 
         #endregion
 
@@ -48,16 +45,13 @@ namespace Codefarts.Input
         /// <exception cref="ArgumentNullException">
         /// Raised if manager parameter is null.
         /// </exception>
-        public ObjectBindingManager(ActionManager manager)
+        public ObjectBindingManager(InputManager manager)
         {
             if (manager == null)
             {
                 throw new ArgumentNullException("manager");
             }
 
-#if XNA
-            this.CheckIUpdateable = true;
-#endif
             this.Manager = manager;
         }
 
@@ -73,22 +67,14 @@ namespace Codefarts.Input
         {
             get
             {
-                return singleton != null ? singleton : (singleton = new ObjectBindingManager(ActionManager.Instance));
+                return singleton != null ? singleton : (singleton = new ObjectBindingManager(InputManager.Instance));
             }
         }
-
-#if XNA
-        /// <summary>
-        /// Gets or sets a value indicating whether or not the bound object implements <see cref="IUpdateable"/>. Default is true.
-        /// </summary>
-        /// <remarks>If set to true and the bound object implements the <see cref="IUpdateable"/> interface, actions will only be raised if <see cref="IUpdateable.Enabled"/> is true.</remarks>
-        public bool CheckIUpdateable { get; set; }
-#endif
 
         /// <summary>
         /// Gets or sets a reference to an action manager that is used to handle user input.
         /// </summary>
-        public ActionManager Manager
+        public InputManager Manager
         {
             get
             {
@@ -123,7 +109,7 @@ namespace Codefarts.Input
         /// <param name="value">
         /// A reference to a <see cref="EventHandler{TEventArgs}"/> type.
         /// </param>
-        public void Bind(string[] actionNames, EventHandler<ActionArgs> value)
+        public void Bind(string[] actionNames, EventHandler<BindingData> value)
         {
             foreach (var name in actionNames)
             {
@@ -143,7 +129,7 @@ namespace Codefarts.Input
         /// <param name="value">
         /// A reference to a <see cref="EventHandler{TEventArgs}"/> type.
         /// </param>
-        public void Bind(string[] actionNames, int player, EventHandler<ActionArgs> value)
+        public void Bind(string[] actionNames, int player, EventHandler<BindingData> value)
         {
             foreach (var name in actionNames)
             {
@@ -160,7 +146,7 @@ namespace Codefarts.Input
         /// <param name="value">
         /// A reference to a <see cref="EventHandler{TEventArgs}"/> type.
         /// </param>
-        public void Bind(string actionName, EventHandler<ActionArgs> value)
+        public void Bind(string actionName, EventHandler<BindingData> value)
         {
             this.Bind(actionName, 0, value);
         }
@@ -177,14 +163,14 @@ namespace Codefarts.Input
         /// <param name="value">
         /// A reference to an <see cref="EventHandler{TEventArgs}"/>.
         /// </param>
-        public void Bind(string actionName, int player, EventHandler<ActionArgs> value)
+        public void Bind(string actionName, int player, EventHandler<BindingData> value)
         {
             if (value == null)
             {
                 throw new ArgumentNullException("value");
             }
 
-            List<EventHandler<ActionArgs>> list;
+            List<EventHandler<BindingData>> list;
             var key = new ActionKey { ActionName = actionName, Player = player };
 
             if (this.ContainsKey(key))
@@ -193,7 +179,7 @@ namespace Codefarts.Input
             }
             else
             {
-                list = new List<EventHandler<ActionArgs>>();
+                list = new List<EventHandler<BindingData>>();
                 this.Add(key, list);
             }
 
@@ -209,7 +195,7 @@ namespace Codefarts.Input
         /// <param name="value">
         /// A reference to a <see cref="EventHandler{TEventArgs}"/> type.
         /// </param>
-        public void Unbind(string[] actionNames, EventHandler<ActionArgs> value)
+        public void Unbind(string[] actionNames, EventHandler<BindingData> value)
         {
             foreach (var name in actionNames)
             {
@@ -229,7 +215,7 @@ namespace Codefarts.Input
         /// <param name="value">
         /// A reference to a <see cref="EventHandler{TEventArgs}"/> type.
         /// </param>
-        public void Unbind(string[] actionNames, int player, EventHandler<ActionArgs> value)
+        public void Unbind(string[] actionNames, int player, EventHandler<BindingData> value)
         {
             foreach (var name in actionNames)
             {
@@ -246,7 +232,7 @@ namespace Codefarts.Input
         /// <param name="value">
         /// A reference to a <see cref="EventHandler{TEventArgs}"/> type.
         /// </param>
-        public void Unbind(string actionName, EventHandler<ActionArgs> value)
+        public void Unbind(string actionName, EventHandler<BindingData> value)
         {
             this.Unbind(actionName, 0, value);
         }
@@ -264,7 +250,7 @@ namespace Codefarts.Input
         /// A reference to an <see cref="EventHandler{TEventArgs}"/> type.
         /// </param>
         /// <exception cref="ArgumentNullException">If <see cref="value"/> is null. (Nothing in Visual Basic)</exception>
-        public void Unbind(string actionName, int player, EventHandler<ActionArgs> value)
+        public void Unbind(string actionName, int player, EventHandler<BindingData> value)
         {
             if (value == null)
             {
@@ -372,7 +358,7 @@ namespace Codefarts.Input
         /// <remarks>
         /// If the specified object is the last remaining object to be bound to an action the action will also be removed.
         /// </remarks>
-        public void UnbindAll(EventHandler<ActionArgs> boundObject)
+        public void UnbindAll(EventHandler<BindingData> boundObject)
         {
             if (boundObject == null)
             {
@@ -383,19 +369,9 @@ namespace Codefarts.Input
             this.Keys.CopyTo(keys, 0);
             foreach (var key in keys)
             {
-                // windows version
-                // this[key].RemoveAll(e => e == boundObject);
-
-                // Silverlight version
-                int count;
-                do
-                {
-                    count = this[key].Count;
-                    this[key].Remove(boundObject);
-                }
-                while (count != this[key].Count);
-
-                if (this[key].Count == 0)
+                var list = this[key];
+                list.RemoveAll(e => e == boundObject);
+                if (list.Count == 0)
                 {
                     this.Remove(key);
                 }
@@ -407,15 +383,15 @@ namespace Codefarts.Input
         #region Methods
 
         /// <summary>
-        /// Handles actions that are raised by the <see cref="ActionManager"/>.
+        /// Handles actions that are raised by the <see cref="InputManager"/>.
         /// </summary>
         /// <param name="sender">
-        /// Typically a reference to the <see cref="ActionManager"/> that raised the event.
+        /// Typically a reference to the <see cref="InputManager"/> that raised the event.
         /// </param>
         /// <param name="e">
         /// Contains data related to the action event.
         /// </param>
-        private void HandleActionEvent(object sender, ActionArgs e)
+        private void HandleActionEvent(object sender, BindingData e)
         {
             var key = new ActionKey { ActionName = e.Name, Player = e.Player };
             if (!this.ContainsKey(key))
@@ -424,21 +400,9 @@ namespace Codefarts.Input
             }
 
             var list = this[key];
-            var index = 0;
-            while (index < list.Count)
+            foreach (var handler in list)
             {
-                var obj = list[index++];
-                if (obj != null)
-                {
-#if XNA
-                    if (this.CheckIUpdateable && obj is IUpdateable && ((IUpdateable)obj).Enabled == false)
-                    {
-                        continue;
-                    } 
-#endif
-
-                    obj.Invoke(this, e);
-                }
+                handler.Invoke(this, e);
             }
         }
 

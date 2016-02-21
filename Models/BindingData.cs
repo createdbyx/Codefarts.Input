@@ -9,121 +9,116 @@
 
 namespace Codefarts.Input.Models
 {
-#if XNA
-    using Microsoft.Xna.Framework.Content;
-#endif
+    using System;
 
     /// <summary>
     /// Provides a class for binding information.
     /// </summary>
-    public partial class BindingData
+    public class BindingData : EventArgs
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:System.Object"/> class.
-        /// </summary>
-        public BindingData()
-        {
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Object" /> class.
         /// </summary>
         /// <param name="name">The binding name.</param>
         /// <param name="device">The device.</param>
         /// <param name="source">The source.</param>
-        /// <param name="player">The player.</param>
         /// <param name="state">The state.</param>
-        /// <param name="alwaysRaise">if set to <c>true</c> [always raise].</param>
-        public BindingData(string name, string device, string source, int player, PressedState state, bool alwaysRaise)
+        /// <param name="player">The player id.</param>
+        public BindingData(string name, string device, string source, PressedState state, int player)
         {
             this.Name = name;
             this.Device = device;
             this.Source = source;
+            this.State = state;
             this.Player = player;
-            this.State = state;
-            this.AlwaysRaise = alwaysRaise;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Object" /> class.
-        /// </summary>
-        /// <param name="name">The binding name.</param>
-        /// <param name="device">The device.</param>
-        /// <param name="source">The source.</param>
-        /// <param name="state">The state.</param>
-        /// <param name="alwaysRaise">if set to <c>true</c> [always raise].</param>
-        public BindingData(string name, string device, string source, PressedState state, bool alwaysRaise)
-        {
-            this.Name = name;
-            this.Device = device;
-            this.Source = source;
-            this.State = state;
-            this.AlwaysRaise = alwaysRaise;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="T:System.Object" /> class.
-        /// </summary>
-        /// <param name="name">The binding name.</param>
-        /// <param name="device">The device.</param>
-        /// <param name="source">The source.</param>
-        /// <param name="state">The state.</param>
-        public BindingData(string name, string device, string source, PressedState state)
-        {
-            this.Name = name;
-            this.Device = device;
-            this.Source = source;
-            this.State = state;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="T:System.Object"/> class.
         /// </summary>
         /// <param name="name">The binding name.</param>
         /// <param name="device">The device.</param>
         /// <param name="source">The source.</param>
         public BindingData(string name, string device, string source)
+            : this(name, device, source, PressedState.Toggle, 0)
         {
-            this.Name = name;
-            this.Device = device;
-            this.Source = source;
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:System.Object" /> class.
+        /// </summary>
+        /// <param name="name">The binding name.</param>
+        /// <param name="device">The device.</param>
+        /// <param name="source">The source.</param>
+        /// <param name="player">The player id.</param>
+        public BindingData(string name, string device, string source, int player)
+            : this(name, device, source, PressedState.Toggle, player)
+        {
+        }
+
+        /// <summary>
+        /// The backing field for the <see cref="Value"/> property.
+        /// </summary>
+        private float value;
 
         /// <summary>
         /// Gets or sets the action name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
         /// <summary>
         /// Gets or sets the device name or id.
         /// </summary>
-        public string Device { get; set; }
+        public string Device { get; private set; }
 
         /// <summary>
         /// Gets or sets the source axis or button on the device.
         /// </summary>
         /// <remarks>This could also point to a device state such as a led light or gyroscope etc.</remarks>
-        public string Source { get; set; }
+        public string Source { get; private set; }
 
-#if XNA
         /// <summary>
         /// Gets or sets the player id.
         /// </summary>
-        [ContentSerializer(Optional = true)]
-        public int Player { get; set; }
+        public int Player { get; private set; }
 
         /// <summary>
         /// Gets or sets the state to compare against.
         /// </summary>
         /// <remarks>This is only used for non axis sources like buttons or led states.</remarks>
-        [ContentSerializer(Optional = true)]
-        public PressedState State { get; set; }
+        public PressedState State { get; private set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the <see cref="ActionManager"/> should raise an action event on every update.
+        /// Gets or sets the value return from the device.
         /// </summary>
-        [ContentSerializer(Optional = true)]
-        public bool AlwaysRaise { get; set; }  
-#endif
+        public float Value
+        {
+            get
+            {
+                return this.value;
+            }
+
+            set
+            {
+                this.PreviousValue = this.value;
+                this.value = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the previous value return from the device.
+        /// </summary>
+        public float PreviousValue { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the relative value.
+        /// </summary>
+        public float RelativeValue
+        {
+            get
+            {
+                return this.Value - this.PreviousValue;
+            }
+        }
     }
 }
