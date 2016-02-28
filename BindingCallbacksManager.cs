@@ -16,16 +16,16 @@ namespace Codefarts.Input
 
 
     /// <summary>
-    /// Used to pair actions with classes.
+    /// Used to pair bindings with callbacks.
     /// </summary>
-    public class ObjectBindingManager : Dictionary<ActionKey, List<EventHandler<BindingData>>>
+    public class BindingCallbacksManager : Dictionary<ActionKey, List<EventHandler<BindingData>>>
     {
         #region Constants and Fields
 
         /// <summary>
         /// Holds a reference to the object binding manager singleton.
         /// </summary>
-        private static ObjectBindingManager singleton;
+        private static BindingCallbacksManager singleton;
 
         /// <summary>
         /// Holds a reference to a <see cref="InputManager"/>.
@@ -37,7 +37,7 @@ namespace Codefarts.Input
         #region Constructors and Destructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObjectBindingManager"/> class.
+        /// Initializes a new instance of the <see cref="BindingCallbacksManager"/> class.
         /// </summary>
         /// <param name="manager">
         /// A reference to a action manager.
@@ -45,7 +45,7 @@ namespace Codefarts.Input
         /// <exception cref="ArgumentNullException">
         /// Raised if manager parameter is null.
         /// </exception>
-        public ObjectBindingManager(InputManager manager)
+        public BindingCallbacksManager(InputManager manager)
         {
             if (manager == null)
             {
@@ -60,14 +60,14 @@ namespace Codefarts.Input
         #region Public Properties
 
         /// <summary>
-        /// Gets a singleton instance of the <see cref="ObjectBindingManager"/>.
+        /// Gets a singleton instance of the <see cref="BindingCallbacksManager"/>.
         /// </summary>
         /// <remarks>The singleton is created on the first call to this property.</remarks>
-        public static ObjectBindingManager Instance
+        public static BindingCallbacksManager Instance
         {
             get
             {
-                return singleton != null ? singleton : (singleton = new ObjectBindingManager(InputManager.Instance));
+                return singleton != null ? singleton : (singleton = new BindingCallbacksManager(InputManager.Instance));
             }
         }
 

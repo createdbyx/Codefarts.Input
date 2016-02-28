@@ -10,7 +10,7 @@
 namespace Codefarts.Input.Models
 {
     /// <summary>
-    /// Provides a key for the <see cref="ObjectBindingManager"/>.
+    /// Provides a key for the <see cref="BindingCallbacksManager"/>.
     /// </summary>
     public struct ActionKey
     {
