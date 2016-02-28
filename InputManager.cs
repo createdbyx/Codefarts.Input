@@ -13,11 +13,7 @@ namespace Codefarts.Input
     using System.Collections.Generic;
 
     using Codefarts.Input.Interfaces;
-    using Codefarts.Input.Models;
-#if UNITY_5
-    using UnityEngine;
-    using Codefarts.Core;
-#endif
+    using Codefarts.Input.Models;    
 
     /// <summary>
     /// The input manager is used to handle device state changes.
@@ -215,6 +211,14 @@ namespace Codefarts.Input
         public virtual void Unbind(string name)
         {
             this.bindings.Remove(name);
+        }
+
+        /// <summary>
+        /// Unbinds all bindings.
+        /// </summary>
+        public virtual void UnbindAll()
+        {
+            this.bindings.Clear();
         }
 
         /// <summary>
