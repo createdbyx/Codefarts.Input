@@ -20,7 +20,7 @@ namespace Codefarts.Input.Models
         /// State of the mouse buttons.
         /// </summary>
         public float[] Buttons;
-        
+
         /// <summary>
         /// The scroll wheel position of the mouse.
         /// </summary>
@@ -35,6 +35,47 @@ namespace Codefarts.Input.Models
         /// The y position of the mouse.
         /// </summary>
         public float Y;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:System.Object"/> class.
+        /// </summary>
+        public MouseState(float x, float y, float[] buttons, float scrollWheelValue)
+        {
+            this.Buttons = buttons;
+            this.ScrollWheelValue = scrollWheelValue;
+            this.X = x;
+            this.Y = y;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:System.Object"/> class.
+        /// </summary>
+        public MouseState(float x, float y)
+            : this()
+        {
+            this.X = x;
+            this.Y = y;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:System.Object"/> class.
+        /// </summary>
+        public MouseState(float x, float y, float[] buttons)
+            : this()
+        {
+            this.Buttons = buttons;
+            this.X = x;
+            this.Y = y;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:System.Object"/> class.
+        /// </summary>
+        public MouseState(float[] buttons)
+            : this()
+        {
+            this.Buttons = buttons;
+        }
 
         #endregion
     }
