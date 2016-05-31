@@ -13,7 +13,7 @@ namespace Codefarts.Input
     using System.Collections.Generic;
 
     using Codefarts.Input.Interfaces;
-    using Codefarts.Input.Models;    
+    using Codefarts.Input.Models;
 
     /// <summary>
     /// The input manager is used to handle device state changes.
@@ -128,6 +128,7 @@ namespace Codefarts.Input
                             {
                                 this.RaiseActionEvent(this, data);
                             }
+
                             continue;
 
                         case PressedState.Released:
@@ -135,6 +136,7 @@ namespace Codefarts.Input
                             {
                                 this.RaiseActionEvent(this, data);
                             }
+
                             continue;
 
                         default:
@@ -142,6 +144,7 @@ namespace Codefarts.Input
                             {
                                 this.RaiseActionEvent(this, data);
                             }
+
                             continue;
                     }
                 }
