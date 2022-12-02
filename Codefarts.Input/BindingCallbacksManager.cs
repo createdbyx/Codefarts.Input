@@ -7,8 +7,6 @@
 </copyright>
 */
 
-using System.Collections.Concurrent;
-
 namespace Codefarts.Input
 {
     using System;
@@ -69,58 +67,7 @@ namespace Codefarts.Input
                 }
             }
         }
-
-        /// <summary>
-        /// Binds an array of action names to a <see cref="EventHandler{TEventArgs}"/>.
-        /// </summary>
-        /// <param name="actionNames">
-        /// The array of action names to bind.
-        /// </param>
-        /// <param name="value">
-        /// A reference to a <see cref="EventHandler{TEventArgs}"/> type.
-        /// </param>
-        public void Bind(string[] actionNames, EventHandler<BindingData> value)
-        {
-            foreach (var name in actionNames)
-            {
-                this.Bind(name, value);
-            }
-        }
-
-        /// <summary>
-        /// Binds an array of action names to a <see cref="EventHandler{TEventArgs}"/>.
-        /// </summary>
-        /// <param name="actionNames">
-        /// The array of action names to bind.
-        /// </param>
-        /// <param name="player">
-        /// The id of the player that will be associated with the action name.
-        /// </param>
-        /// <param name="value">
-        /// A reference to a <see cref="EventHandler{TEventArgs}"/> type.
-        /// </param>
-        public void Bind(string[] actionNames, int player, EventHandler<BindingData> value)
-        {
-            foreach (var name in actionNames)
-            {
-                this.Bind(name, player, value);
-            }
-        }
-
-        /// <summary>
-        /// Binds an array of action names to a <see cref="EventHandler{TEventArgs}"/>.
-        /// </summary>
-        /// <param name="actionName">
-        /// The action name to bind.
-        /// </param>
-        /// <param name="value">
-        /// A reference to a <see cref="EventHandler{TEventArgs}"/> type.
-        /// </param>
-        public void Bind(string actionName, EventHandler<BindingData> value)
-        {
-            this.Bind(actionName, 0, value);
-        }
-
+                         
         /// <summary>
         /// Binds a action name to a <see cref="EventHandler{TEventArgs}"/>.
         /// </summary>
@@ -156,56 +103,7 @@ namespace Codefarts.Input
             list.Add(value);
         }
 
-        /// <summary>
-        /// Unbinds an array of action names from a <see cref="EventHandler{TEventArgs}"/>.
-        /// </summary>
-        /// <param name="actionNames">
-        /// The array of action names to unbind.
-        /// </param>
-        /// <param name="value">
-        /// A reference to a <see cref="EventHandler{TEventArgs}"/> type.
-        /// </param>
-        public void Unbind(string[] actionNames, EventHandler<BindingData> value)
-        {
-            foreach (var name in actionNames)
-            {
-                this.Unbind(name, value);
-            }
-        }
-
-        /// <summary>
-        /// Unbinds an array of action names from a <see cref="EventHandler{TEventArgs}"/>.
-        /// </summary>
-        /// <param name="actionNames">
-        /// The array of action names to unbind.
-        /// </param>
-        /// <param name="player">
-        /// The id of the player that will be associated with the action name.
-        /// </param>
-        /// <param name="value">
-        /// A reference to a <see cref="EventHandler{TEventArgs}"/> type.
-        /// </param>
-        public void Unbind(string[] actionNames, int player, EventHandler<BindingData> value)
-        {
-            foreach (var name in actionNames)
-            {
-                this.Unbind(name, player, value);
-            }
-        }
-
-        /// <summary>
-        /// Unbinds an action name from a <see cref="EventHandler{TEventArgs}"/>.
-        /// </summary>
-        /// <param name="actionName">
-        /// The array of action name to unbind.
-        /// </param>
-        /// <param name="value">
-        /// A reference to a <see cref="EventHandler{TEventArgs}"/> type.
-        /// </param>
-        public void Unbind(string actionName, EventHandler<BindingData> value)
-        {
-            this.Unbind(actionName, 0, value);
-        }
+      
 
         /// <summary>
         /// Unbinds a action name from a <see cref="EventHandler{TEventArgs}"/>.
