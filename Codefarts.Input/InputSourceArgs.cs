@@ -5,26 +5,26 @@ namespace Codefarts.Input
     using Codefarts.Input.Interfaces;
 
     /// <summary>
-    /// Provides device arguments for <see cref="IDevice"/> implementations.
+    /// Provides inputSource arguments for <see cref="IInputSource"/> implementations.
     /// </summary>
     /// <seealso cref="System.EventArgs" />
-    public class DeviceArgs : EventArgs
+    public class InputSourceArgs : EventArgs
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.EventArgs" /> class.
         /// </summary>
-        public DeviceArgs()
+        public InputSourceArgs()
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.EventArgs" /> class.
         /// </summary>
-        /// <param name="device">The name of the device.</param>
-        /// <param name="source">The device source.</param>
-        /// <param name="value">The value from the device.</param>
+        /// <param name="device">The name of the inputSource.</param>
+        /// <param name="source">The inputSource source.</param>
+        /// <param name="value">The value from the inputSource.</param>
         /// <param name="type">The type of value.</param>
-        public DeviceArgs(string device, string source, float value, EventType type) : this()
+        public InputSourceArgs(string device, string source, float value, EventType type) : this()
         {
             this.Device = device;
             this.Source = source;
@@ -33,19 +33,19 @@ namespace Codefarts.Input
         }
 
         /// <summary>
-        /// Gets or sets the name or id of the device.
+        /// Gets or sets the name or id of the inputSource.
         /// </summary>
         public string Device { get; set; }
 
         /// <summary>
-        /// Gets or sets an array of available device sources.
+        /// Gets or sets an array of available inputSource sources.
         /// </summary>
         public string Source { get; set; }
 
         /// <summary>
-        /// Gets or sets the value return from the device.
+        /// Gets or sets the value return from the inputSource.
         /// </summary>
-        /// <remarks>This could also refer to a device state such as a led light or gyroscope etc.</remarks>
+        /// <remarks>This could also refer to a inputSource state such as a led light or gyroscope etc.</remarks>
         public float Value { get; set; }
                                     
         /// <summary>

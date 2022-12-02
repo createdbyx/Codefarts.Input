@@ -11,35 +11,23 @@ namespace Codefarts.Input
 {
     using System;
     using System.Collections.Generic;
-
     using Codefarts.Input.Interfaces;
     using Codefarts.Input.Models;
 
     /// <summary>
-    /// The input manager is used to handle device state changes.
+    /// The input manager is used to handle inputSource state changes.
     /// </summary>
     public class InputManager
     {
-        /// <summary>
-        /// Reference to a singleton for the <see cref="Instance"/> property.
-        /// </summary>
-        private static InputManager singleton;
-
         /// <summary>
         /// Holds a collection of objects the implement the IBinder interface.
         /// </summary>
         protected Dictionary<string, BindingData> bindings;
 
         /// <summary>
-        /// Gets or sets a list of registered devices.
+        /// Gets or sets a list of registered inputSourcesDictionary.
         /// </summary>
-        protected Dictionary<string, IDevice> devices;
-
-        /// <summary>
-        /// The lock object used when accessing the <see cref="Instance"/> property for the first time.
-        /// </summary>
-        private static object lockObject = new object();
-
+        protected Dictionary<string, IInputSource> inputSourcesDictionary;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InputManager"/> class. 
@@ -47,13 +35,13 @@ namespace Codefarts.Input
         public InputManager()
         {
             this.bindings = new Dictionary<string, BindingData>();
-            this.devices = new Dictionary<string, IDevice>();
+            this.inputSourcesDictionary = new Dictionary<string, IInputSource>();
         }
 
         /// <summary>
-        /// Removes the device using the devices name.
+        /// Removes the inputSource using the inputSourcesDictionary name.
         /// </summary>
-        /// <param name="name">The name of the device to remove.</param>
+        /// <param name="name">The name of the inputSource to remove.</param>
         /// <exception cref="System.ArgumentException">Device name is null or missing.;name</exception>
         public virtual void RemoveDevice(string name)
         {
@@ -62,53 +50,53 @@ namespace Codefarts.Input
                 throw new ArgumentException("Device name is null or missing.", "name");
             }
 
-            var device = this.devices[name];
-            device.Changed -= this.DeviceStateChanged;
-            this.devices.Remove(device.Name);
+            var device = this.inputSourcesDictionary[name];
+            device.Changed -= this.InputSourceStateChanged;
+            this.inputSourcesDictionary.Remove(device.Name);
         }
 
         /// <summary>
-        /// Gets the names of the devices that have been added.
+        /// Gets the names of the inputSourcesDictionary that have been added.
         /// </summary>
         public virtual string[] Devices
         {
             get
             {
-                var keys = new string[this.devices.Count];
-                this.devices.Keys.CopyTo(keys, 0);
+                var keys = new string[this.inputSourcesDictionary.Count];
+                this.inputSourcesDictionary.Keys.CopyTo(keys, 0);
                 return keys;
             }
         }
 
         /// <summary>
-        /// Adds the device.
+        /// Adds the inputSource.
         /// </summary>
-        /// <param name="device">The device to add.</param>
-        /// <exception cref="System.ArgumentNullException">device</exception>
-        /// <exception cref="System.ArgumentException">Device name is null or missing.;device</exception>
-        /// <remarks>Can not add the same device twice.</remarks>
-        public virtual void AddDevice(IDevice device)
+        /// <param name="inputSource">The inputSource to add.</param>
+        /// <exception cref="System.ArgumentNullException">inputSource</exception>
+        /// <exception cref="System.ArgumentException">Device name is null or missing.;inputSource</exception>
+        /// <remarks>Can not add the same inputSource twice.</remarks>
+        public virtual void AddDevice(IInputSource inputSource)
         {
-            if (device == null)
+            if (inputSource == null)
             {
-                throw new ArgumentNullException("device");
+                throw new ArgumentNullException("inputSource");
             }
 
-            if (device.Name == null || device.Name.Trim() == string.Empty)
+            if (string.IsNullOrWhiteSpace(inputSource.Name))
             {
-                throw new ArgumentException("Device name is null or missing.", "device");
+                throw new ArgumentException("Input source name is null or missing.", "inputSource");
             }
 
-            this.devices.Add(device.Name, device);
-            device.Changed += this.DeviceStateChanged;
+            this.inputSourcesDictionary.Add(inputSource.Name, inputSource);
+            inputSource.Changed += this.InputSourceStateChanged;
         }
 
         /// <summary>
-        /// Handles device state changes and updates binders.
+        /// Handles inputSource state changes and updates binders.
         /// </summary>
         /// <param name="sender">The sender.</param>
-        /// <param name="e">The device arguments.</param>
-        protected virtual void DeviceStateChanged(object sender, DeviceArgs e)
+        /// <param name="e">The inputSource arguments.</param>
+        protected virtual void InputSourceStateChanged(object sender, InputSourceArgs e)
         {
             foreach (var binding in this.bindings)
             {
@@ -140,7 +128,7 @@ namespace Codefarts.Input
                             continue;
 
                         default:
-                            if (Math.Abs(data.Value - data.PreviousValue) > float.Epsilon)
+                            if (Math.Abs(data.RelativeValue) > float.Epsilon)
                             {
                                 this.RaiseActionEvent(this, data);
                             }
@@ -154,38 +142,18 @@ namespace Codefarts.Input
         }
 
         /// <summary>
-        /// The Action event is raised every time a user device change is detected and it matches a binding.
+        /// The Action event is raised every time a user inputSource change is detected and it matches a binding.
         /// </summary>
         public event EventHandler<BindingData> Action;
 
         /// <summary>
-        /// Gets singleton instance of the <see cref="InputManager"/> type.
-        /// </summary>
-        /// <remarks>THe singleton is created the first time the property is accessed.</remarks>
-        public static InputManager Instance
-        {
-            get
-            {
-                if (singleton == null)
-                {
-                    lock (lockObject)
-                    {
-                        singleton = new InputManager();
-                    }
-                }
-
-                return singleton;
-            }
-        }
-
-        /// <summary>
-        /// Gets the number of devices that have been added.
+        /// Gets the number of inputSourcesDictionary that have been added.
         /// </summary>
         public virtual int DeviceCount
         {
             get
             {
-                return this.devices.Count;
+                return this.inputSourcesDictionary.Count;
             }
         }
 
@@ -213,7 +181,8 @@ namespace Codefarts.Input
         /// </remarks>
         public virtual void Unbind(string name)
         {
-            this.bindings.Remove(name);
+            BindingData? bindingData = null;
+            this.bindings.Remove(name, out bindingData);
         }
 
         /// <summary>
@@ -225,68 +194,24 @@ namespace Codefarts.Input
         }
 
         /// <summary>
-        /// Binds the specified name to a device and device source.
+        /// Binds the specified name to a inputSource and inputSource source.
         /// </summary>
         /// <param name="name">The name of the binder.</param>
-        /// <param name="device">The device name.</param>
-        /// <param name="source">The source name on the device.</param>
-        /// <remarks>
-        /// The name parameter is case sensitive.
-        /// </remarks>
-        public virtual void Bind(string name, string device, string source)
-        {
-            this.Bind(name, device, source, PressedState.Toggle, 0);
-        }
-
-        /// <summary>
-        /// Binds the specified name to a device and device source.
-        /// </summary>
-        /// <param name="name">The name of the binder.</param>
-        /// <param name="device">The device name.</param>
-        /// <param name="source">The source name on the device.</param>
-        /// <param name="player">The player id associated with the binding.</param>
-        /// <remarks>
-        /// The name parameter is case sensitive.
-        /// </remarks>
-        public virtual void Bind(string name, string device, string source, int player)
-        {
-            this.Bind(name, device, source, PressedState.Toggle, player);
-        }
-
-        /// <summary>
-        /// Binds the specified name to a device and device source.
-        /// </summary>
-        /// <param name="name">The name of the binder.</param>
-        /// <param name="device">The device name.</param>
-        /// <param name="source">The source name on the device.</param>
-        /// <param name="pressState">The pressed state if the device source is a button.</param>
-        /// <remarks>
-        /// The name parameter is case sensitive.
-        /// </remarks>
-        public virtual void Bind(string name, string device, string source, PressedState pressState)
-        {
-            this.Bind(name, device, source, pressState, 0);
-        }
-
-        /// <summary>
-        /// Binds the specified name to a device and device source.
-        /// </summary>
-        /// <param name="name">The name of the binder.</param>
-        /// <param name="device">The device name.</param>
-        /// <param name="source">The source name on the device.</param>
-        /// <param name="pressState">The pressed state if the device source is a button.</param>
+        /// <param name="device">The inputSource name.</param>
+        /// <param name="source">The source name on the inputSource.</param>
+        /// <param name="pressState">The pressed state if the inputSource source is a button.</param>
         /// <param name="player">The player id associated with the binding.</param>
         /// <remarks>
         /// The name parameter is case sensitive.
         /// </remarks>
         public virtual void Bind(string name, string device, string source, PressedState pressState, int player)
         {
-            if (!this.devices.ContainsKey(device))
+            if (!this.inputSourcesDictionary.ContainsKey(device))
             {
-                throw new KeyNotFoundException("No device with the name '" + device + "' was found.");
+                throw new KeyNotFoundException("No inputSource with the name '" + device + "' was found.");
             }
 
-            var dev = this.devices[device];
+            var dev = this.inputSourcesDictionary[device];
             var any = false;
             foreach (var x in dev.Sources)
             {
@@ -307,29 +232,14 @@ namespace Codefarts.Input
         }
 
         /// <summary>
-        /// Polls all devices that have been added to the InputManager.
+        /// Polls all inputSourcesDictionary that have been added to the InputManager.
         /// </summary>       
         public virtual void Update()
         {
-            foreach (var device in this.devices)
+            foreach (var device in this.inputSourcesDictionary)
             {
                 device.Value.Poll();
             }
-        }
-
-        /// <summary>
-        /// Gets the value of a binding.
-        /// </summary>
-        /// <param name="name">The binding name.</param>
-        /// <param name="value">Will contain the value of the binding.</param>
-        /// <returns>Returns true if the binding was found.</returns>
-        /// <remarks>
-        /// Keep in mind that the value may not represent the actual state of the hardware.
-        /// The name parameter is case sensitive.
-        /// </remarks>   
-        public virtual bool GetValue(string name, out float value)
-        {
-            return this.GetValue(name, false, out value);
         }
 
         /// <summary>

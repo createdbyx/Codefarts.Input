@@ -14,8 +14,6 @@ namespace Codefarts.Input.Models
     /// </summary>
     internal struct MouseState
     {
-        #region Constants and Fields
-
         /// <summary>
         /// State of the mouse buttons.
         /// </summary>
@@ -76,7 +74,5 @@ namespace Codefarts.Input.Models
         {
             this.Buttons = buttons;
         }
-
-        #endregion
     }
 }

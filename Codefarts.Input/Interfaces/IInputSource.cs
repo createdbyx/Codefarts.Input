@@ -12,36 +12,28 @@ namespace Codefarts.Input.Interfaces
     using System;
 
     /// <summary>
-    /// Provides a interface for devices.
+    /// Provides a interface for inputSourcesDictionary.
     /// </summary>
-    public interface IDevice
+    public interface IInputSource
     {
-        #region Public Properties
-
         /// <summary>
-        /// Gets the name or id of the device.
+        /// Gets the name or id of the inputSource.
         /// </summary>
         string Name { get; }
 
         /// <summary>
-        /// Gets an array of available device sources.
+        /// Gets an array of available inputSource sources.
         /// </summary>
         string[] Sources { get; }
 
-        #endregion
-
         /// <summary>
-        /// Occurs when a device state changes.
+        /// Occurs when a inputSource state changes.
         /// </summary>
-        event EventHandler<DeviceArgs> Changed;
-
-        #region Public Methods and Operators
+        event EventHandler<InputSourceArgs> Changed;
 
         /// <summary>
-        /// Polls the device for changes and raises <see cref="Changed"/> event is a change occoured.
+        /// Polls the inputSource for changes and raises <see cref="Changed"/> event if a change occoured.
         /// </summary>     
         void Poll();
-
-        #endregion    
     }
 }

@@ -14,8 +14,6 @@ namespace Codefarts.Input.Models
     /// </summary>
     public struct ActionKey
     {
-        #region Constants and Fields
-
         /// <summary>
         /// Gets or sets the name of the action.
         /// </summary>
@@ -25,7 +23,5 @@ namespace Codefarts.Input.Models
         /// Gets or sets the player index.
         /// </summary>
         public int Player;
-
-        #endregion
     }
 }

@@ -7,11 +7,12 @@
 </copyright>
 */
 
+using System.Collections.Concurrent;
+
 namespace Codefarts.Input
 {
     using System;
     using System.Collections.Generic;
-
     using Codefarts.Input.Models;
 
 
@@ -20,21 +21,10 @@ namespace Codefarts.Input
     /// </summary>
     public class BindingCallbacksManager : Dictionary<ActionKey, List<EventHandler<BindingData>>>
     {
-        #region Constants and Fields
-
-        /// <summary>
-        /// Holds a reference to the object binding manager singleton.
-        /// </summary>
-        private static BindingCallbacksManager singleton;
-
         /// <summary>
         /// Holds a reference to a <see cref="InputManager"/>.
         /// </summary>
         private InputManager manager;
-
-        #endregion
-
-        #region Constructors and Destructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BindingCallbacksManager"/> class.
@@ -49,26 +39,10 @@ namespace Codefarts.Input
         {
             if (manager == null)
             {
-                throw new ArgumentNullException("manager");
+                throw new ArgumentNullException(nameof(manager));
             }
 
             this.Manager = manager;
-        }
-
-        #endregion
-
-        #region Public Properties
-
-        /// <summary>
-        /// Gets a singleton instance of the <see cref="BindingCallbacksManager"/>.
-        /// </summary>
-        /// <remarks>The singleton is created on the first call to this property.</remarks>
-        public static BindingCallbacksManager Instance
-        {
-            get
-            {
-                return singleton != null ? singleton : (singleton = new BindingCallbacksManager(InputManager.Instance));
-            }
         }
 
         /// <summary>
@@ -81,7 +55,7 @@ namespace Codefarts.Input
                 return this.manager;
             }
 
-            set
+            private set
             {
                 if (this.manager != null)
                 {
@@ -95,10 +69,6 @@ namespace Codefarts.Input
                 }
             }
         }
-
-        #endregion
-
-        #region Public Methods and Operators
 
         /// <summary>
         /// Binds an array of action names to a <see cref="EventHandler{TEventArgs}"/>.
@@ -378,10 +348,6 @@ namespace Codefarts.Input
             }
         }
 
-        #endregion
-
-        #region Methods
-
         /// <summary>
         /// Handles actions that are raised by the <see cref="InputManager"/>.
         /// </summary>
@@ -405,7 +371,5 @@ namespace Codefarts.Input
                 handler.Invoke(this, e);
             }
         }
-
-        #endregion
     }
 }
