@@ -12,6 +12,7 @@ class InputManagerMovement
     {
         this.isRunning = true;
         Console.CursorVisible = false;
+        Console.Clear();
 
         var inputManager = new InputManager();
         var inputSource = new ConsoleInputSource();
