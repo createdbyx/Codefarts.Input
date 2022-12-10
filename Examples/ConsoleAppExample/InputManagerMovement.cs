@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Data;
+using System.Drawing;
 using Codefarts.Input;
 using Codefarts.Input.ConsoleInputSource;
 
@@ -13,11 +14,13 @@ class InputManagerMovement
         this.isRunning = true;
         Console.CursorVisible = false;
         Console.Clear();
-
+        var startTime = DateTime.Now;
+        var lastUpdate = startTime;
+        
         var inputManager = new InputManager();
         var inputSource = new ConsoleInputSource();
 
-        inputManager.AddDevice(inputSource);
+        inputManager.AddSource(inputSource);
         inputManager.Bind("MoveUp", "Console", "W");
         inputManager.Bind("MoveDown", "Console", "S");
         inputManager.Bind("MoveLeft", "Console", "A");
@@ -25,10 +28,10 @@ class InputManagerMovement
         inputManager.Bind("Quit", "Console", "Q");
 
         var callbacksManager = new BindingCallbacksManager(inputManager);
-        callbacksManager.Bind("MoveUp", (_, _) => this.MovePosition(new Point(0, -1)));
+        callbacksManager.Bind("MoveUp", (_, e) => this.MovePosition(new Point(0, -1)));
         callbacksManager.Bind("MoveDown", this.MoveDown);
-        callbacksManager.Bind("MoveLeft", (_, _) => this.MovePosition(new Point(-1, 0)));
-        callbacksManager.Bind("MoveRight", (_, _) => this.MovePosition(new Point(1, 0)));
+        callbacksManager.Bind("MoveLeft", (_, e) => this.MovePosition(new Point(-1, 0)));
+        callbacksManager.Bind("MoveRight", (_, e) => this.MovePosition(new Point(1, 0)));
         callbacksManager.Bind("Quit", (_, _) => this.isRunning = false);
 
         while (this.isRunning)
@@ -40,7 +43,11 @@ class InputManagerMovement
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.Write("*");
 
-            inputManager.Update();
+            var currentTime = DateTime.Now;
+            var totalTime = currentTime.Subtract(startTime);
+            var elapsedTime =  currentTime.Subtract(lastUpdate);
+            inputManager.Update(totalTime, elapsedTime);
+            lastUpdate = currentTime;
         }
     }
 

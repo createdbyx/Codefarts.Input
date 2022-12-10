@@ -14,6 +14,12 @@ namespace Codefarts.Input.Models
     /// </summary>
     public struct ActionKey
     {
+        public ActionKey(string actionName, int player)
+        {
+            this.ActionName = actionName;
+            this.Player = player;
+        }
+
         /// <summary>
         /// Gets or sets the name of the action.
         /// </summary>

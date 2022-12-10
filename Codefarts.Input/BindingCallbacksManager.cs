@@ -100,6 +100,7 @@ namespace Codefarts.Input
                 this.Add(key, list);
             }
 
+            //TODO: CHeck if value already added ?
             list.Add(value);
         }
 
@@ -257,7 +258,7 @@ namespace Codefarts.Input
         /// </param>
         private void HandleActionEvent(object sender, BindingData e)
         {
-            var key = new ActionKey { ActionName = e.Name, Player = e.Player };
+            var key = new ActionKey(e.Name, e.Player);
             if (!this.ContainsKey(key))
             {
                 return;
@@ -266,7 +267,7 @@ namespace Codefarts.Input
             var list = this[key];
             foreach (var handler in list)
             {
-                handler.Invoke(this, e);
+                handler?.Invoke(this, e);
             }
         }
     }

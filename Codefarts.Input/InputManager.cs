@@ -42,29 +42,32 @@ namespace Codefarts.Input
         /// Removes the inputSource using the inputSourcesDictionary name.
         /// </summary>
         /// <param name="name">The name of the inputSource to remove.</param>
-        /// <exception cref="System.ArgumentException">Device name is null or missing.;name</exception>
-        public virtual void RemoveDevice(string name)
+        /// <exception cref="System.ArgumentException">InputSource name is null or missing.;name</exception>
+        public virtual void RemoveSource(string name)
         {
-            if (name == null || name.Trim() == string.Empty)
+            if (string.IsNullOrWhiteSpace(name?.Trim()) )
             {
-                throw new ArgumentException("Device name is null or missing.", "name");
+                throw new ArgumentException("InputSource name is null or missing.", "name");
             }
 
-            var device = this.inputSourcesDictionary[name];
-            device.Changed -= this.InputSourceStateChanged;
-            this.inputSourcesDictionary.Remove(device.Name);
+            var source = this.inputSourcesDictionary[name];
+            this.inputSourcesDictionary.Remove(source.Name);
         }
 
         /// <summary>
         /// Gets the names of the inputSourcesDictionary that have been added.
         /// </summary>
-        public virtual string[] Devices
+        public virtual string[] Sources
         {
             get
             {
-                var keys = new string[this.inputSourcesDictionary.Count];
-                this.inputSourcesDictionary.Keys.CopyTo(keys, 0);
-                return keys;
+                var sources = this.inputSourcesDictionary;
+                lock (sources)
+                {
+                    var keys = new string[sources.Count];
+                    sources.Keys.CopyTo(keys, 0);
+                    return keys;
+                }
             }
         }
 
@@ -73,72 +76,21 @@ namespace Codefarts.Input
         /// </summary>
         /// <param name="inputSource">The inputSource to add.</param>
         /// <exception cref="System.ArgumentNullException">inputSource</exception>
-        /// <exception cref="System.ArgumentException">Device name is null or missing.;inputSource</exception>
+        /// <exception cref="System.ArgumentException">InputSource name is null or missing.;inputSource</exception>
         /// <remarks>Can not add the same inputSource twice.</remarks>
-        public virtual void AddDevice(IInputSource inputSource)
+        public virtual void AddSource(IInputSource inputSource)
         {
             if (inputSource == null)
             {
-                throw new ArgumentNullException("inputSource");
+                throw new ArgumentNullException(nameof(inputSource));
             }
 
             if (string.IsNullOrWhiteSpace(inputSource.Name))
             {
-                throw new ArgumentException("Input source name is null or missing.", "inputSource");
+                throw new ArgumentException("Input source name is null or missing.", nameof(inputSource));
             }
 
             this.inputSourcesDictionary.Add(inputSource.Name, inputSource);
-            inputSource.Changed += this.InputSourceStateChanged;
-        }
-
-        /// <summary>
-        /// Handles inputSource state changes and updates binders.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The inputSource arguments.</param>
-        protected virtual void InputSourceStateChanged(object sender, InputSourceArgs e)
-        {
-            foreach (var binding in this.bindings)
-            {
-                var data = binding.Value;
-                if (!data.Device.Equals(e.Device) || !data.Source.Equals(e.Source))
-                {
-                    continue;
-                }
-
-                data.Value = e.Value;
-                if (e.Type == EventType.Button)
-                {
-                    switch (data.State)
-                    {
-                        case PressedState.Pressed:
-                            if (data.RelativeValue > 0)
-                            {
-                                this.RaiseActionEvent(this, data);
-                            }
-
-                            continue;
-
-                        case PressedState.Released:
-                            if (data.RelativeValue < 0)
-                            {
-                                this.RaiseActionEvent(this, data);
-                            }
-
-                            continue;
-
-                        default:
-                            if (Math.Abs(data.RelativeValue) > float.Epsilon)
-                            {
-                                this.RaiseActionEvent(this, data);
-                            }
-
-                            continue;
-                    }
-                }
-
-                this.RaiseActionEvent(this, data);
-            }
         }
 
         /// <summary>
@@ -149,7 +101,7 @@ namespace Codefarts.Input
         /// <summary>
         /// Gets the number of inputSourcesDictionary that have been added.
         /// </summary>
-        public virtual int DeviceCount
+        public virtual int NumberOfInputSources
         {
             get
             {
@@ -166,10 +118,7 @@ namespace Codefarts.Input
         {
             // only raise if the event has an invocation list.
             var handler = this.Action;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
+            handler?.Invoke(this, e);
         }
 
         /// <summary>
@@ -204,7 +153,8 @@ namespace Codefarts.Input
         /// <remarks>
         /// The name parameter is case sensitive.
         /// </remarks>
-        public virtual void Bind(string name, string device, string source, PressedState pressState, int player)
+        public virtual void Bind(string name, string device, string source, int player)
+            //  public virtual void Bind(string name, string device, string source, PressedState pressState, int player)
         {
             if (!this.inputSourcesDictionary.ContainsKey(device))
             {
@@ -224,21 +174,41 @@ namespace Codefarts.Input
 
             if (!any)
             {
-                throw new Exception(string.Format("Device '{0}' does not appear to contain the requested source '{1}'.", device, source));
+                throw new Exception(string.Format("InputSource '{0}' does not appear to contain the requested source '{1}'.", device, source));
             }
 
-            var data = new BindingData(name, device, source, pressState, player);
+            var data = new BindingData(name, device, source, player);
             this.bindings.Add(name, data);
         }
 
         /// <summary>
         /// Polls all inputSourcesDictionary that have been added to the InputManager.
         /// </summary>       
-        public virtual void Update()
+        public virtual void Update(TimeSpan totalTime, TimeSpan elapsedTime)
         {
-            foreach (var device in this.inputSourcesDictionary)
+            var sourcesToPoll = from outer in this.inputSourcesDictionary
+                                from inner in this.bindings
+                                where outer.Value.Name == inner.Value.InputSource
+                                select outer;
+
+            foreach (var inputSource in sourcesToPoll)
             {
-                device.Value.Poll();
+                var pollData = inputSource.Value.Poll();
+
+                var matches = from outer in pollData
+                              from inner in this.bindings
+                              where outer.Source == inner.Value.Source  
+                              select new { Binding = inner.Value, PolledValue = outer.Value };
+
+                foreach (var match in matches)
+                {
+                    // update binding data
+                    match.Binding.Value = match.PolledValue;
+                    match.Binding.TotalTime = totalTime;
+                    match.Binding.ElapsedTime = elapsedTime;
+
+                    this.RaiseActionEvent(this, match.Binding);
+                }
             }
         }
 

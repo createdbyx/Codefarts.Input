@@ -11,25 +11,69 @@ namespace Codefarts.Input.Models
 {
     using System;
 
+    public class PollingData : EventArgs
+    {
+        public PollingData(string inputSource, string source, float value)
+        {
+            this.InputSource = inputSource;
+            this.Source = source;
+            this.Value = value;                 
+        }
+
+        /// <summary>
+        /// Gets or sets the inputSource name or id.
+        /// </summary>
+        public string InputSource { get; protected set; }
+
+        /// <summary>
+        /// Gets or sets the source axis or button on the inputSource.
+        /// </summary>
+        /// <remarks>This could also point to a inputSource state such as a led light or gyroscope etc.</remarks>
+        public string Source { get; protected set; }
+
+        /// <summary>
+        /// Gets or sets the value return from the inputSource.
+        /// </summary>
+        public virtual float Value { get; set; }
+    }
+
     /// <summary>
     /// Provides a class for binding information.
     /// </summary>
-    public class BindingData : EventArgs
+    public class BindingData : PollingData
     {
+        // /// <summary>
+        // /// Initializes a new instance of the <see cref="T:System.Object" /> class.
+        // /// </summary>
+        // /// <param name="name">The binding name.</param>
+        // /// <param name="inputSource">The inputSource.</param>
+        // /// <param name="source">The source.</param>
+        // /// <param name="state">The state.</param>
+        // /// <param name="player">The player id.</param>
+        // public BindingData(string name, string inputSource, string source, PressedState state, int player)
+        // : base(inputSource,source,PressedState)
+        // {
+        //     this.Name = name;
+        //     this.InputSource = inputSource;
+        //     this.Source = source;
+        //     this.State = state;
+        //     this.Player = player;
+        // }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Object" /> class.
         /// </summary>
         /// <param name="name">The binding name.</param>
-        /// <param name="device">The inputSource.</param>
+        /// <param name="inputSource">The inputSource.</param>
         /// <param name="source">The source.</param>
         /// <param name="state">The state.</param>
         /// <param name="player">The player id.</param>
-        public BindingData(string name, string device, string source, PressedState state, int player)
+        public BindingData(string name, string inputSource, string source, float value, int player)
+            : base(inputSource, source, value)
         {
             this.Name = name;
-            this.Device = device;
+            this.InputSource = inputSource;
             this.Source = source;
-            this.State = state;
             this.Player = player;
         }
 
@@ -37,10 +81,10 @@ namespace Codefarts.Input.Models
         /// Initializes a new instance of the <see cref="T:System.Object" /> class.
         /// </summary>
         /// <param name="name">The binding name.</param>
-        /// <param name="device">The inputSource.</param>
+        /// <param name="inputSource">The inputSource.</param>
         /// <param name="source">The source.</param>
-        public BindingData(string name, string device, string source)
-            : this(name, device, source, PressedState.Toggle, 0)
+        public BindingData(string name, string inputSource, string source)
+            : this(name, inputSource, source, 0)
         {
         }
 
@@ -48,34 +92,32 @@ namespace Codefarts.Input.Models
         /// Initializes a new instance of the <see cref="T:System.Object" /> class.
         /// </summary>
         /// <param name="name">The binding name.</param>
-        /// <param name="device">The inputSource.</param>
+        /// <param name="inputSource">The inputSource.</param>
         /// <param name="source">The source.</param>
         /// <param name="player">The player id.</param>
-        public BindingData(string name, string device, string source, int player)
-            : this(name, device, source, PressedState.Toggle, player)
+        public BindingData(string name, string inputSource, string source, int player)
+            : this(name, inputSource, source, 0f, player)
         {
         }
 
-        /// <summary>
-        /// The backing field for the <see cref="Value"/> property.
-        /// </summary>
-        private float value;
+        public override float Value
+        {
+            get
+            {
+                return base.Value;
+            }
+
+            set
+            {
+                this.PreviousValue = base.Value;
+                base.Value = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the action name.
         /// </summary>
         public string Name { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the inputSource name or id.
-        /// </summary>
-        public string Device { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the source axis or button on the inputSource.
-        /// </summary>
-        /// <remarks>This could also point to a inputSource state such as a led light or gyroscope etc.</remarks>
-        public string Source { get; private set; }
 
         /// <summary>
         /// Gets or sets the player id.
@@ -86,24 +128,7 @@ namespace Codefarts.Input.Models
         /// Gets or sets the state to compare against.
         /// </summary>
         /// <remarks>This is only used for non axis sources like buttons or led states.</remarks>
-        public PressedState State { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the value return from the inputSource.
-        /// </summary>
-        public float Value
-        {
-            get
-            {
-                return this.value;
-            }
-
-            set
-            {
-                this.PreviousValue = this.value;
-                this.value = value;
-            }
-        }
+        // public PressedState State { get; private set; }
 
         /// <summary>
         /// Gets or sets the previous value return from the inputSource.
@@ -120,5 +145,8 @@ namespace Codefarts.Input.Models
                 return this.Value - this.PreviousValue;
             }
         }
+
+        public TimeSpan TotalTime { get; set; }
+        public TimeSpan ElapsedTime { get; set; }
     }
 }

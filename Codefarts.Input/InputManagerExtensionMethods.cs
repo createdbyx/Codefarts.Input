@@ -13,10 +13,10 @@ public static class InputManagerExtensionMethods
     /// </remarks>
     public static void Bind(this InputManager input, string name, string device, string source)
     {
-        input.Bind(name, device, source, PressedState.Toggle, 0);
+        input.Bind(name, device, source,  0);
     }
 
-    /// <summary>
+  /// <summary>
     /// Binds the specified name to a inputSource and inputSource source.
     /// </summary>
     /// <param name="name">The name of the binder.</param>
@@ -28,10 +28,10 @@ public static class InputManagerExtensionMethods
     /// </remarks>
     public static void Bind(this InputManager input, string name, string device, string source, int player)
     {
-        input.Bind(name, device, source, PressedState.Toggle, player);
+        input.Bind(name, device, source,  player);
     }
 
-    /// <summary>
+     /*  /// <summary>
     /// Binds the specified name to a inputSource and inputSource source.
     /// </summary>
     /// <param name="name">The name of the binder.</param>
@@ -45,6 +45,7 @@ public static class InputManagerExtensionMethods
     {
         input.Bind(name, device, source, pressState, 0);
     }
+   */
 
     /// <summary>
     /// Gets the value of a binding.

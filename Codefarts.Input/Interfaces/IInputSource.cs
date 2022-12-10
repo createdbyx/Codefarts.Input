@@ -7,6 +7,8 @@
 </copyright>
 */
 
+using Codefarts.Input.Models;
+
 namespace Codefarts.Input.Interfaces
 {
     using System;
@@ -29,11 +31,11 @@ namespace Codefarts.Input.Interfaces
         /// <summary>
         /// Occurs when a inputSource state changes.
         /// </summary>
-        event EventHandler<InputSourceArgs> Changed;
+      //  event EventHandler<InputSourceArgs> Changed;
 
         /// <summary>
-        /// Polls the inputSource for changes and raises <see cref="Changed"/> event if a change occoured.
+        /// Polls the inputSource for changes and returns <see cref="Changed"/> event if a change occoured.
         /// </summary>     
-        void Poll();
+        IEnumerable< PollingData> Poll();
     }
 }

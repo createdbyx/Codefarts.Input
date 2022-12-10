@@ -1,4 +1,5 @@
 ﻿using Codefarts.Input.Interfaces;
+using Codefarts.Input.Models;
 
 namespace Codefarts.Input.ConsoleInputSource;
 
@@ -21,19 +22,25 @@ public class ConsoleInputSource : IInputSource
         }
     }
 
-    public event EventHandler<InputSourceArgs>? Changed;
+    //  public event EventHandler<InputSourceArgs>? Changed;
 
-    public void Poll()
+    public IEnumerable<PollingData> Poll()
     {
         if (Console.KeyAvailable)
         {
             var key = Console.ReadKey(true);
-            this.OnChanged(new InputSourceArgs(this.Name, key.Key.ToString(), 0, EventType.Other));
+            return new[]
+            {
+              //  new PollingData(this.Name, key.Key.ToString(), 1),
+                new PollingData(this.Name, key.Key.ToString(), 0)
+                //         this.OnChanged(new InputSourceArgs(this.Name, key.Key.ToString(), 0, EventType.Other));
+            };
         }
-    }
 
-    protected virtual void OnChanged(InputSourceArgs e)
-    {
-        this.Changed?.Invoke(this, e);
+        return Enumerable.Empty<PollingData>();
+        // protected virtual void OnChanged(InputSourceArgs e)
+        // {
+        //     this.Changed?.Invoke(this, e);
+        // }
     }
 }

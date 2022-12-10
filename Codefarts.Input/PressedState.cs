@@ -10,7 +10,7 @@
 namespace Codefarts.Input
 {
     using System;
-
+             /*
     /// <summary>
     /// Provides an enumeration for specifying a pressed button state.
     /// </summary>
@@ -31,5 +31,5 @@ namespace Codefarts.Input
         /// Specifies either a button press or button release event.
         /// </summary>
         Toggle = 3
-    }
+    }      */
 }

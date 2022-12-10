@@ -3,7 +3,7 @@ namespace Codefarts.Input
     using System;
 
     using Codefarts.Input.Interfaces;
-
+   /*
     /// <summary>
     /// Provides inputSource arguments for <see cref="IInputSource"/> implementations.
     /// </summary>
@@ -52,5 +52,5 @@ namespace Codefarts.Input
         /// Gets or sets the type of <see cref="Value"/>.
         /// </summary>
         public EventType Type { get; set; }
-    }
+    }       */
 }
