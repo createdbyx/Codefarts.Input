@@ -45,7 +45,7 @@ namespace Codefarts.Input
         /// <exception cref="System.ArgumentException">InputSource name is null or missing.;name</exception>
         public virtual void RemoveSource(string name)
         {
-            if (string.IsNullOrWhiteSpace(name?.Trim()) )
+            if (string.IsNullOrWhiteSpace(name?.Trim()))
             {
                 throw new ArgumentException("InputSource name is null or missing.", "name");
             }
@@ -116,6 +116,11 @@ namespace Codefarts.Input
         /// <param name="e">A reference to an <see cref="BindingData"/> object containing information about the event.</param>
         public virtual void RaiseActionEvent(object sender, BindingData e)
         {
+            if (e == null)
+            {
+                throw new ArgumentNullException(nameof(e));
+            }
+
             // only raise if the event has an invocation list.
             var handler = this.Action;
             handler?.Invoke(this, e);
@@ -154,7 +159,6 @@ namespace Codefarts.Input
         /// The name parameter is case sensitive.
         /// </remarks>
         public virtual void Bind(string name, string device, string source, int player)
-            //  public virtual void Bind(string name, string device, string source, PressedState pressState, int player)
         {
             if (!this.inputSourcesDictionary.ContainsKey(device))
             {
@@ -186,6 +190,7 @@ namespace Codefarts.Input
         /// </summary>       
         public virtual void Update(TimeSpan totalTime, TimeSpan elapsedTime)
         {
+            // Find input sources that match the bindings we have set up 
             var sourcesToPoll = from outer in this.inputSourcesDictionary
                                 from inner in this.bindings
                                 where outer.Value.Name == inner.Value.InputSource
@@ -193,12 +198,15 @@ namespace Codefarts.Input
 
             foreach (var inputSource in sourcesToPoll)
             {
+                // Get input source data 
                 var pollData = inputSource.Value.Poll();
 
+                // Find bindings that match source values 
                 var matches = from outer in pollData
                               from inner in this.bindings
-                              where outer.Source == inner.Value.Source  
+                              where outer.Source == inner.Value.Source
                               select new { Binding = inner.Value, PolledValue = outer.Value };
+
 
                 foreach (var match in matches)
                 {
@@ -207,7 +215,7 @@ namespace Codefarts.Input
                     match.Binding.TotalTime = totalTime;
                     match.Binding.ElapsedTime = elapsedTime;
 
-                    this.RaiseActionEvent(this, match.Binding);
+                    this.RaiseActionEvent(this, match.Binding.Clone() as BindingData);
                 }
             }
         }

@@ -22,8 +22,6 @@ public class ConsoleInputSource : IInputSource
         }
     }
 
-    //  public event EventHandler<InputSourceArgs>? Changed;
-
     public IEnumerable<PollingData> Poll()
     {
         if (Console.KeyAvailable)
@@ -31,16 +29,10 @@ public class ConsoleInputSource : IInputSource
             var key = Console.ReadKey(true);
             return new[]
             {
-              //  new PollingData(this.Name, key.Key.ToString(), 1),
                 new PollingData(this.Name, key.Key.ToString(), 0)
-                //         this.OnChanged(new InputSourceArgs(this.Name, key.Key.ToString(), 0, EventType.Other));
             };
         }
 
         return Enumerable.Empty<PollingData>();
-        // protected virtual void OnChanged(InputSourceArgs e)
-        // {
-        //     this.Changed?.Invoke(this, e);
-        // }
     }
 }

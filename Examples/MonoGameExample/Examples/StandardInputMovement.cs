@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using Codefarts.MonoGame.SimpleMenuComponent;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -54,5 +56,20 @@ public class StandardInputMovement : DrawableGameComponent
         var directionDeta = (directionVector * this.movementSpeed) * gameTime.ElapsedGameTime.Milliseconds;
         this.position = Vector2.Subtract(this.position, (keyboardState.IsKeyDown(Keys.W) ? directionDeta : Vector2.Zero));
         this.position = Vector2.Add(this.position, (keyboardState.IsKeyDown(Keys.S) ? directionDeta : Vector2.Zero));
+
+        if (keyboardState.IsKeyDown(Keys.Escape))
+        {
+            this.Exit();
+        }
+    }
+
+    private void Exit()
+    {
+        this.Game.Components.Remove(this);
+        var menu = Game.Components.OfType<SimpleMenuComponent>().FirstOrDefault();
+        var controller = Game.Components.OfType<SimpleMenuController>().FirstOrDefault();
+        controller.Enabled = true;
+        menu.Enabled = true;
+        menu.Visible = true;
     }
 }

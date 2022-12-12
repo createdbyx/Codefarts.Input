@@ -1,5 +1,4 @@
-﻿using System.Data;
-using System.Drawing;
+﻿using System.Drawing;
 using Codefarts.Input;
 using Codefarts.Input.ConsoleInputSource;
 

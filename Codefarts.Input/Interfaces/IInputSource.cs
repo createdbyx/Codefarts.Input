@@ -11,8 +11,6 @@ using Codefarts.Input.Models;
 
 namespace Codefarts.Input.Interfaces
 {
-    using System;
-
     /// <summary>
     /// Provides a interface for inputSourcesDictionary.
     /// </summary>
@@ -27,12 +25,7 @@ namespace Codefarts.Input.Interfaces
         /// Gets an array of available inputSource sources.
         /// </summary>
         string[] Sources { get; }
-
-        /// <summary>
-        /// Occurs when a inputSource state changes.
-        /// </summary>
-      //  event EventHandler<InputSourceArgs> Changed;
-
+ 
         /// <summary>
         /// Polls the inputSource for changes and returns <see cref="Changed"/> event if a change occoured.
         /// </summary>     

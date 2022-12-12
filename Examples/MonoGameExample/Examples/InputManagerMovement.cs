@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using Codefarts.Input;
 using Codefarts.Input.Models;
 using Codefarts.Input.MonoGameSources;
+using Codefarts.MonoGame.SimpleMenuComponent;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -36,7 +38,7 @@ public class InputManagerMovement : DrawableGameComponent
         inputManager.Bind("MoveBackward", "Keyboard", "S");
         inputManager.Bind("TurnLeft", "Keyboard", "A");
         inputManager.Bind("TurnRight", "Keyboard", "D");
-        inputManager.Bind("Quit", "Keyboard", "Q");                         
+        inputManager.Bind("Quit", "Keyboard", "Escape");                         
 
         callbacksManager = new BindingCallbacksManager(inputManager);
         callbacksManager.Bind("MoveForward", this.MoveForward);
@@ -52,7 +54,7 @@ public class InputManagerMovement : DrawableGameComponent
     {
         if (bindingData.RelativeValue == -1)
         {
-            this.Game.Exit();
+            this.Exit();
         }
     }
 
@@ -108,5 +110,15 @@ public class InputManagerMovement : DrawableGameComponent
     public override void Update(GameTime gameTime)
     {
         inputManager.Update(gameTime.TotalGameTime, gameTime.ElapsedGameTime);
+    }
+    
+    private void Exit()
+    {
+        this.Game.Components.Remove(this);
+        var menu = Game.Components.OfType<SimpleMenuComponent>().FirstOrDefault();
+        var controller = Game.Components.OfType<SimpleMenuController>().FirstOrDefault();
+        controller.Enabled = true;
+        menu.Enabled = true;
+        menu.Visible = true;
     }
 }

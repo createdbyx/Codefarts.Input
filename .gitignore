@@ -173,3 +173,4 @@ $RECYCLE.BIN/
 *.ttf
 *.asset
 *.StyleCop
+.vs/
