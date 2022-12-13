@@ -16,10 +16,11 @@ public class SimpleMenuController : GameComponent
     {
         this.Menu = menu;
         this.input = new InputManager();
-        this.input.AddSource(new KeyboardSource());
-        this.input.Bind("Select", "Keyboard", Keys.Enter.ToString());
-        this.input.Bind("Next", "Keyboard", Keys.Down.ToString());
-        this.input.Bind("Prev", "Keyboard", Keys.Up.ToString());
+        var kbSource = new KeyboardSource();
+        this.input.AddSource(kbSource);
+        this.input.Bind("Select", kbSource.Name, Keys.Enter.ToString());
+        this.input.Bind("Next", kbSource.Name, Keys.Down.ToString());
+        this.input.Bind("Prev", kbSource.Name, Keys.Up.ToString());
 
         this.callbacks = new BindingCallbacksManager(this.input);
         this.callbacks.Bind("Next", b =>

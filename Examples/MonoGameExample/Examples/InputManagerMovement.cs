@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using Codefarts.Input;
 using Codefarts.Input.Models;
@@ -31,14 +30,14 @@ public class InputManagerMovement : DrawableGameComponent
     {
         this.spriteBatch = new SpriteBatch(this.Game.GraphicsDevice);
         inputManager = new InputManager();
-        var inputSource = new KeyboardSource();
+        var kbSource = new KeyboardSource();
 
-        inputManager.AddSource(inputSource);
-        inputManager.Bind("MoveForward", "Keyboard", "W");
-        inputManager.Bind("MoveBackward", "Keyboard", "S");
-        inputManager.Bind("TurnLeft", "Keyboard", "A");
-        inputManager.Bind("TurnRight", "Keyboard", "D");
-        inputManager.Bind("Quit", "Keyboard", "Escape");                         
+        inputManager.AddSource(kbSource);
+        inputManager.Bind("MoveForward", kbSource.Name, "W");
+        inputManager.Bind("MoveBackward", kbSource.Name, "S");
+        inputManager.Bind("TurnLeft", kbSource.Name, "A");
+        inputManager.Bind("TurnRight", kbSource.Name, "D");
+        inputManager.Bind("Quit", kbSource.Name, "Escape");
 
         callbacksManager = new BindingCallbacksManager(inputManager);
         callbacksManager.Bind("MoveForward", this.MoveForward);
@@ -102,8 +101,7 @@ public class InputManagerMovement : DrawableGameComponent
         var half = new Vector2(this.texture.Width / 2, this.texture.Height / 2);
 
         this.spriteBatch.Begin();
-        this.spriteBatch.Draw(this.texture, this.position, sourceRectangle, Color.White, -this.rotation, half, Vector2.One,
-                              SpriteEffects.None, 0);
+        this.spriteBatch.Draw(this.texture, this.position, sourceRectangle, Color.White, -this.rotation, half, Vector2.One, SpriteEffects.None, 0);
         this.spriteBatch.End();
     }
 
@@ -111,7 +109,7 @@ public class InputManagerMovement : DrawableGameComponent
     {
         inputManager.Update(gameTime.TotalGameTime, gameTime.ElapsedGameTime);
     }
-    
+
     private void Exit()
     {
         this.Game.Components.Remove(this);

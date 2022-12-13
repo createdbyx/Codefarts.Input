@@ -14,8 +14,9 @@ namespace Codefarts.Input.Models
     /// <summary>
     /// Provides a class for binding information.
     /// </summary>
-    public class BindingData : PollingData  ,ICloneable
+    public struct BindingData
     {
+
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Object" /> class.
         /// </summary>
@@ -25,12 +26,15 @@ namespace Codefarts.Input.Models
         /// <param name="state">The state.</param>
         /// <param name="player">The player id.</param>
         public BindingData(string name, string inputSource, string source, float value, int player)
-            : base(inputSource, source, value)
         {
             this.Name = name;
             this.InputSource = inputSource;
             this.Source = source;
             this.Player = player;
+            this.Value = value;
+            this.PreviousValue = 0;
+            this.TotalTime = default;
+            this.ElapsedTime = default;
         }
 
         /// <summary>
@@ -56,34 +60,36 @@ namespace Codefarts.Input.Models
         {
         }
 
-        public override float Value
-        {
-            get
-            {
-                return base.Value;
-            }
+        /// <summary>
+        /// Gets or sets the inputSource name or id.
+        /// </summary>
+        public string InputSource { get; }
 
-            set
-            {
-                this.PreviousValue = base.Value;
-                base.Value = value;
-            }
-        }
+        /// <summary>
+        /// Gets or sets the source axis or button on the inputSource.
+        /// </summary>
+        /// <remarks>This could also point to a inputSource state such as a led light or gyroscope etc.</remarks>
+        public string Source { get; }
 
+        /// <summary>
+        /// Gets or sets the value return from the inputSource.
+        /// </summary>
+        public float Value { get; set; }
+        
         /// <summary>
         /// Gets or sets the action name.
         /// </summary>
-        public string Name { get; private set; }
+        public string Name { get; }
 
         /// <summary>
         /// Gets or sets the player id.
         /// </summary>
-        public int Player { get; private set; }
+        public int Player { get; }
 
         /// <summary>
         /// Gets or sets the previous value return from the inputSource.
         /// </summary>
-        public float PreviousValue { get; private set; }
+        public float PreviousValue { get;   set; }
 
         /// <summary>
         /// Gets or sets the relative value.
@@ -98,10 +104,5 @@ namespace Codefarts.Input.Models
 
         public TimeSpan TotalTime { get; set; }
         public TimeSpan ElapsedTime { get; set; }
-        
-        public object Clone()
-        {
-            return this.MemberwiseClone();
-        }
     }
 }

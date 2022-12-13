@@ -110,23 +110,6 @@ namespace Codefarts.Input
         }
 
         /// <summary>
-        /// Raises the action event.
-        /// </summary>
-        /// <param name="sender">The object sending the event.</param>
-        /// <param name="e">A reference to an <see cref="BindingData"/> object containing information about the event.</param>
-        public virtual void RaiseActionEvent(object sender, BindingData e)
-        {
-            if (e == null)
-            {
-                throw new ArgumentNullException(nameof(e));
-            }
-
-            // only raise if the event has an invocation list.
-            var handler = this.Action;
-            handler?.Invoke(this, e);
-        }
-
-        /// <summary>
         /// Unbinds a binding.
         /// </summary>
         /// <param name="name">The name of the binding to unbind. See remarks for more info.</param>
@@ -135,7 +118,7 @@ namespace Codefarts.Input
         /// </remarks>
         public virtual void Unbind(string name)
         {
-            BindingData? bindingData = null;
+            BindingData bindingData;
             this.bindings.Remove(name, out bindingData);
         }
 
@@ -207,15 +190,21 @@ namespace Codefarts.Input
                               where outer.Source == inner.Value.Source
                               select new { Binding = inner.Value, PolledValue = outer.Value };
 
-
                 foreach (var match in matches)
                 {
-                    // update binding data
-                    match.Binding.Value = match.PolledValue;
-                    match.Binding.TotalTime = totalTime;
-                    match.Binding.ElapsedTime = elapsedTime;
+                    var updatedBinding =
+                        new BindingData(match.Binding.Name, match.Binding.InputSource, match.Binding.Source, match.PolledValue,
+                                        match.Binding.Player)
+                        {
+                            TotalTime = totalTime,
+                            ElapsedTime = elapsedTime,
+                            PreviousValue = match.Binding.Value
+                        };
 
-                    this.RaiseActionEvent(this, match.Binding.Clone() as BindingData);
+                    this.bindings[match.Binding.Name] = updatedBinding;
+
+                    var handler = this.Action;
+                    handler?.Invoke(this, updatedBinding);
                 }
             }
         }
