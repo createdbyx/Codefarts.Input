@@ -67,7 +67,7 @@ namespace Codefarts.Input
                 }
             }
         }
-                         
+
         /// <summary>
         /// Binds a action name to a <see cref="EventHandler{TEventArgs}"/>.
         /// </summary>
@@ -103,8 +103,6 @@ namespace Codefarts.Input
             //TODO: CHeck if value already added ?
             list.Add(value);
         }
-
-      
 
         /// <summary>
         /// Unbinds a action name from a <see cref="EventHandler{TEventArgs}"/>.
@@ -194,31 +192,6 @@ namespace Codefarts.Input
         }
 
         /// <summary>
-        /// Unbinds all objects that match a <see cref="ActionKey"/>.
-        /// </summary>
-        /// <param name="key">
-        /// The key.
-        /// </param>
-        public void UnbindAll(ActionKey key)
-        {
-            this[key].Clear();
-        }
-
-        /// <summary>
-        /// Unbinds all objects that are bound to the action names.
-        /// </summary>
-        /// <param name="actionNames">
-        /// The action Names.
-        /// </param>
-        public void UnbindAll(string[] actionNames)
-        {
-            foreach (var name in actionNames)
-            {
-                this.UnbindAll(name);
-            }
-        }
-
-        /// <summary>
         /// Unbinds the specified object if it is associated with any actions.
         /// </summary>
         /// <param name="boundObject">
@@ -231,7 +204,7 @@ namespace Codefarts.Input
         {
             if (boundObject == null)
             {
-                throw new ArgumentNullException("boundObject");
+                throw new ArgumentNullException(nameof(boundObject));
             }
 
             var keys = new ActionKey[this.Keys.Count];

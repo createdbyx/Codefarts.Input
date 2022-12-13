@@ -5,6 +5,31 @@ namespace Codefarts.Input;
 public static class BindingCallbacksManagerExtensionMethods
 {
     /// <summary>
+    /// Unbinds all objects that match a <see cref="ActionKey"/>.
+    /// </summary>
+    /// <param name="key">
+    /// The key.
+    /// </param>
+    public static void UnbindAll(this BindingCallbacksManager manager, ActionKey key)
+    {
+        manager[key].Clear();
+    }
+
+    /// <summary>
+    /// Unbinds all objects that are bound to the action names.
+    /// </summary>
+    /// <param name="actionNames">
+    /// The action Names.
+    /// </param>
+    public static void UnbindAll(this BindingCallbacksManager manager, string[] actionNames)
+    {
+        foreach (var name in actionNames)
+        {
+            manager.UnbindAll(name);
+        }
+    }
+    
+    /// <summary>
     /// Binds an array of action names to a <see cref="EventHandler{TEventArgs}"/>.
     /// </summary>
     /// <param name="actionNames">
