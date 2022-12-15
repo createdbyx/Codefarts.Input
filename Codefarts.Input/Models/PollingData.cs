@@ -13,6 +13,7 @@ public struct PollingData
         this.InputSource = inputSource;
         this.Source = source;
         this.Value = value;
+        this.DataType = DataType.Other;
     }
 
     /// <summary>
@@ -30,4 +31,6 @@ public struct PollingData
     /// Gets or sets the value return from the inputSource.
     /// </summary>
     public float Value { get; }
+
+    public DataType DataType { get; set; }
 }

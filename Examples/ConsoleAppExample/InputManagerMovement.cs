@@ -20,11 +20,11 @@ class InputManagerMovement
         var inputSource = new ConsoleInputSource();
 
         inputManager.AddSource(inputSource);
-        inputManager.Bind("MoveUp", "Console", "W");
-        inputManager.Bind("MoveDown", "Console", "S");
-        inputManager.Bind("MoveLeft", "Console", "A");
-        inputManager.Bind("MoveRight", "Console", "D");
-        inputManager.Bind("Quit", "Console", "Q");
+        inputManager.Bind("MoveUp", inputSource, "W");
+        inputManager.Bind("MoveDown", inputSource, "S");
+        inputManager.Bind("MoveLeft", inputSource, "A");
+        inputManager.Bind("MoveRight", inputSource, "D");
+        inputManager.Bind("Quit", inputSource, "Q");
 
         var callbacksManager = new BindingCallbacksManager(inputManager);
         callbacksManager.Bind("MoveUp", (_, e) => this.MovePosition(new Point(0, -1)));

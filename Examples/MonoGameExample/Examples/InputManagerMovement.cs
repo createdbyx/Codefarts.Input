@@ -15,8 +15,8 @@ public class InputManagerMovement : DrawableGameComponent
     private SpriteBatch spriteBatch;
     private Vector2 position = Vector2.One * 100;
     private float rotation = MathHelper.ToRadians(0);
-    private float rotationSpeed = 0.05f;
-    private float movementSpeed = 0.1f;
+    private float rotationSpeed = 0.25f;
+    private float movementSpeed = 0.5f;
     private InputManager inputManager;
     private BindingCallbacksManager callbacksManager;
     private float rotationDelta;
@@ -31,19 +31,25 @@ public class InputManagerMovement : DrawableGameComponent
         this.spriteBatch = new SpriteBatch(this.Game.GraphicsDevice);
         inputManager = new InputManager();
         var kbSource = new KeyboardSource();
+        var gpSource = new GamePadSource();
 
         inputManager.AddSource(kbSource);
-        inputManager.Bind("MoveForward", kbSource.Name, "W");
-        inputManager.Bind("MoveBackward", kbSource.Name, "S");
-        inputManager.Bind("TurnLeft", kbSource.Name, "A");
-        inputManager.Bind("TurnRight", kbSource.Name, "D");
-        inputManager.Bind("Quit", kbSource.Name, "Escape");
+        inputManager.AddSource(gpSource);
+        inputManager.Bind("MoveForward", kbSource, "W");
+        inputManager.Bind("MoveBackward", kbSource, "S");
+        inputManager.Bind("MoveForward", gpSource, "RightTrigger");
+        inputManager.Bind("MoveBackward", gpSource, "LeftTrigger");
+        inputManager.Bind("TurnLeft", kbSource, "A");
+        inputManager.Bind("TurnRight", kbSource, "D");
+        inputManager.Bind("Turn", gpSource, "LeftThumbStickX");
+        inputManager.Bind("Quit", kbSource, "Escape");
 
         callbacksManager = new BindingCallbacksManager(inputManager);
         callbacksManager.Bind("MoveForward", this.MoveForward);
         callbacksManager.Bind("MoveBackward", this.MoveBackward);
         callbacksManager.Bind("TurnLeft", this.TurnLeft);
         callbacksManager.Bind("TurnRight", this.TurnRight);
+        callbacksManager.Bind("Turn", this.DoTurn);
         callbacksManager.Bind("Quit", this.QuitGame);
 
         base.Initialize();
@@ -74,7 +80,14 @@ public class InputManagerMovement : DrawableGameComponent
         var directionDeta = (directionVector * this.speed) * bindingData.ElapsedTime.Milliseconds;
         this.position = Vector2.Add(this.position, directionDeta);
     }
-
+    
+    private void DoTurn(BindingData bindingData)
+    {
+        var speed = bindingData.Value * this.rotationSpeed;
+        this.rotationDelta = MathHelper.ToRadians(speed) * bindingData.ElapsedTime.Milliseconds;
+        this.rotation -= this.rotationDelta;
+    }
+    
     private void TurnLeft(BindingData bindingData)
     {
         var speed = bindingData.Value * this.rotationSpeed;

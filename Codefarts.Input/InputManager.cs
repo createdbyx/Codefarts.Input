@@ -7,12 +7,14 @@
 </copyright>
 */
 
+using System.Data;
+
 namespace Codefarts.Input
 {
     using System;
     using System.Collections.Generic;
-    using Codefarts.Input.Interfaces;
-    using Codefarts.Input.Models;
+    using Interfaces;
+    using Models;
 
     /// <summary>
     /// The input manager is used to handle inputSource state changes.
@@ -22,20 +24,20 @@ namespace Codefarts.Input
         /// <summary>
         /// Holds a collection of objects the implement the IBinder interface.
         /// </summary>
-        protected Dictionary<string, BindingData> bindings;
+        protected List<BindingData> bindings;
 
         /// <summary>
         /// Gets or sets a list of registered inputSourcesDictionary.
         /// </summary>
-        protected Dictionary<string, IInputSource> inputSourcesDictionary;
+        protected List<IInputSource> inputSourcesDictionary;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InputManager"/> class. 
         /// </summary>
         public InputManager()
         {
-            this.bindings = new Dictionary<string, BindingData>();
-            this.inputSourcesDictionary = new Dictionary<string, IInputSource>();
+            this.bindings = new List<BindingData>();
+            this.inputSourcesDictionary = new List<IInputSource>();
         }
 
         /// <summary>
@@ -50,8 +52,20 @@ namespace Codefarts.Input
                 throw new ArgumentException("InputSource name is null or missing.", "name");
             }
 
-            var source = this.inputSourcesDictionary[name];
-            this.inputSourcesDictionary.Remove(source.Name);
+            for (int i = this.inputSourcesDictionary.Count - 1; i >= 0; i--)
+            {
+                var entry = this.inputSourcesDictionary[i];
+                if (entry.Name.Equals(name, StringComparison.InvariantCulture))
+                {
+                    this.inputSourcesDictionary.RemoveAt(i);
+                }
+            }
+            // var sources = this.inputSourcesDictionary.Where(x=>x.Name.Equals(name, StringComparison.InvariantCulture)).ToArray();
+            // foreach (var s in sources)
+            // {
+            //     this.inputSourcesDictionary.Remove(s)
+            // }
+            //this.inputSourcesDictionary.Remove(source.Name);
         }
 
         /// <summary>
@@ -64,9 +78,10 @@ namespace Codefarts.Input
                 var sources = this.inputSourcesDictionary;
                 lock (sources)
                 {
-                    var keys = new string[sources.Count];
-                    sources.Keys.CopyTo(keys, 0);
-                    return keys;
+                    return sources.Select(x => x.Name).ToArray();
+                    // var keys = new string[sources.Count];
+                    // sources.Keys.CopyTo(keys, 0);
+//                    return keys;
                 }
             }
         }
@@ -90,7 +105,14 @@ namespace Codefarts.Input
                 throw new ArgumentException("Input source name is null or missing.", nameof(inputSource));
             }
 
-            this.inputSourcesDictionary.Add(inputSource.Name, inputSource);
+            if (this.inputSourcesDictionary.Any(x => x.Name.Equals(inputSource.Name, StringComparison.InvariantCulture)))
+            {
+                throw new ArgumentException("Input source with same name already added.");
+            }
+
+            this.inputSourcesDictionary.Add(inputSource);
+
+            //this.inputSourcesDictionary.Add(inputSource.Name, inputSource);
         }
 
         /// <summary>
@@ -119,7 +141,15 @@ namespace Codefarts.Input
         public virtual void Unbind(string name)
         {
             BindingData bindingData;
-            this.bindings.Remove(name, out bindingData);
+            //var list = this.bindings[name];
+            for (int i = this.bindings.Count - 1; i >= 0; i--)
+            {
+                bindingData = this.bindings[i];
+                if (bindingData.Name.Equals(name, StringComparison.InvariantCulture))
+                {
+                    this.bindings.RemoveAt(i);
+                }
+            }
         }
 
         /// <summary>
@@ -141,31 +171,43 @@ namespace Codefarts.Input
         /// <remarks>
         /// The name parameter is case sensitive.
         /// </remarks>
-        public virtual void Bind(string name, string device, string source, int player)
+        public virtual void Bind(string name, IInputSource device, string source, int player)
         {
-            if (!this.inputSourcesDictionary.ContainsKey(device))
+            if (device == null)
             {
-                throw new KeyNotFoundException("No inputSource with the name '" + device + "' was found.");
+                throw new ArgumentNullException(nameof(device));
             }
 
-            var dev = this.inputSourcesDictionary[device];
-            var any = false;
-            foreach (var x in dev.Sources)
+            if (!this.inputSourcesDictionary.Any(x => x.Name.Equals(device.Name, StringComparison.InvariantCulture)))
             {
-                if (x.Equals(source))
-                {
-                    any = true;
-                    break;
-                }
+                throw new ArgumentException("InputSource with the name '" + device.Name + "' not found.");
             }
 
-            if (!any)
-            {
-                throw new Exception(string.Format("InputSource '{0}' does not appear to contain the requested source '{1}'.", device, source));
-            }
+            // var dev = this.inputSourcesDictionary[device];
+            // var any = false;
+            // foreach (var x in dev.Sources)
+            // {
+            //     if (x.Equals(source))
+            //     {
+            //         any = true;
+            //         break;
+            //     }
+            // }
+            //
+            // if (!any)
+            // {
+            //     throw new Exception(string.Format("InputSource '{0}' does not appear to contain the requested source '{1}'.", device, source));
+            // }
 
             var data = new BindingData(name, device, source, player);
-            this.bindings.Add(name, data);
+            // if (!this.bindings.ContainsKey(name))
+            // {
+            //     this.bindings.Add(name, new List<BindingData>());
+            // }
+            //
+            // var list = this.bindings[name]
+            // list.Add(data);
+            this.bindings.Add(data);
         }
 
         /// <summary>
@@ -173,66 +215,45 @@ namespace Codefarts.Input
         /// </summary>       
         public virtual void Update(TimeSpan totalTime, TimeSpan elapsedTime)
         {
-            // Find input sources that match the bindings we have set up 
-            var sourcesToPoll = from outer in this.inputSourcesDictionary
-                                from inner in this.bindings
-                                where outer.Value.Name == inner.Value.InputSource
-                                select outer;
-
-            foreach (var inputSource in sourcesToPoll)
+            // group bindings by their input source 
+            var polledSources = new Dictionary<IInputSource, IEnumerable<PollingData>>();
+            for (var bindingIndex = 0; bindingIndex < this.bindings.Count; bindingIndex++)
             {
-                // Get input source data 
-                var pollData = inputSource.Value.Poll();
+                // get the binding
+                var binding = this.bindings[bindingIndex];
 
-                // Find bindings that match source values 
-                var matches = from outer in pollData
-                              from inner in this.bindings
-                              where outer.Source == inner.Value.Source
-                              select new { Binding = inner.Value, PolledValue = outer.Value };
-
-                foreach (var match in matches)
+                // check if the binding input source has been polled yet and if not poll it storing the results
+                if (!polledSources.ContainsKey(binding.InputSource))
                 {
-                    var updatedBinding =
-                        new BindingData(match.Binding.Name, match.Binding.InputSource, match.Binding.Source, match.PolledValue,
-                                        match.Binding.Player)
-                        {
-                            TotalTime = totalTime,
-                            ElapsedTime = elapsedTime,
-                            PreviousValue = match.Binding.Value
-                        };
+                    polledSources.Add(binding.InputSource, binding.InputSource.Poll());
+                }
 
-                    this.bindings[match.Binding.Name] = updatedBinding;
+                // fetch polled data
+                var polledData = polledSources[binding.InputSource];
 
+                // loop thru each polled data
+                foreach (var data in polledData)
+                {
+                    // if the sources do not match skip it
+                    if (!data.Source.Equals(binding.Source, StringComparison.InvariantCulture))
+                    {
+                        continue;
+                    }
+
+                    // otherwise update the binding values
+                    binding.TotalTime = totalTime;
+                    binding.ElapsedTime = elapsedTime;
+                    binding.PreviousValue = binding.Value;
+                    binding.Value = data.Value;
+
+                    // update binding data
+                    this.bindings[bindingIndex] = binding;
+
+                    // raise action event
                     var handler = this.Action;
-                    handler?.Invoke(this, updatedBinding);
+                    handler?.Invoke(this, binding);
                 }
             }
-        }
-
-        /// <summary>
-        /// Gets the value of a binding.
-        /// </summary>
-        /// <param name="name">The binding name.</param>
-        /// <param name="relative">if set to <c>true</c> the relative value will be returned based on it's previous value.</param>
-        /// <param name="value">Will contain the value of the binding.</param>
-        /// <returns>
-        /// Returns true if the binder was found.
-        /// </returns>
-        /// <remarks>
-        /// Keep in mind that the value may not represent the actual state of the hardware.
-        /// The name parameter is case sensitive.
-        /// </remarks>
-        public virtual bool GetValue(string name, bool relative, out float value)
-        {
-            if (!this.bindings.ContainsKey(name))
-            {
-                value = 0;
-                return false;
-            }
-
-            var binder = this.bindings[name];
-            value = binder.Value - (relative ? binder.PreviousValue : 0);
-            return true;
-        }
+        } 
     }
 }

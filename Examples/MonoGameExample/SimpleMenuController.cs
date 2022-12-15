@@ -18,9 +18,9 @@ public class SimpleMenuController : GameComponent
         this.input = new InputManager();
         var kbSource = new KeyboardSource();
         this.input.AddSource(kbSource);
-        this.input.Bind("Select", kbSource.Name, Keys.Enter.ToString());
-        this.input.Bind("Next", kbSource.Name, Keys.Down.ToString());
-        this.input.Bind("Prev", kbSource.Name, Keys.Up.ToString());
+        this.input.Bind("Select", kbSource, Keys.Enter.ToString());
+        this.input.Bind("Next", kbSource, Keys.Down.ToString());
+        this.input.Bind("Prev", kbSource, Keys.Up.ToString());
 
         this.callbacks = new BindingCallbacksManager(this.input);
         this.callbacks.Bind("Next", b =>

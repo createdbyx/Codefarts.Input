@@ -11,7 +11,7 @@ namespace Codefarts.Input
 {
     using System;
     using System.Collections.Generic;
-    using Codefarts.Input.Models;
+    using Models;
 
 
     /// <summary>

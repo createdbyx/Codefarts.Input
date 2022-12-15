@@ -45,7 +45,10 @@ public class KeyboardSource : IInputSource
 
         foreach (var key in keys)
         {
-            results.Add(new PollingData(this.Name, key.ToString(), state[key] == KeyState.Down ? 1 : 0));
+            results.Add(new PollingData(this.Name, key.ToString(), state[key] == KeyState.Down ? 1 : 0)
+            {
+                DataType = DataType.Button
+            });
         }
 
         return results;
