@@ -216,6 +216,12 @@ namespace Codefarts.Input
         public virtual void Update(TimeSpan totalTime, TimeSpan elapsedTime)
         {
             // group bindings by their input source 
+            var handler = this.Action;
+            if (handler == null)
+            {
+                return;
+            }
+            
             var polledSources = new Dictionary<IInputSource, IEnumerable<PollingData>>();
             for (var bindingIndex = 0; bindingIndex < this.bindings.Count; bindingIndex++)
             {
@@ -250,8 +256,7 @@ namespace Codefarts.Input
                     this.bindings[bindingIndex] = binding;
 
                     // raise action event
-                    var handler = this.Action;
-                    handler?.Invoke(this, binding);
+                    handler.Invoke(this, binding);
                 }
             }
         } 
