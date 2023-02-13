@@ -93,6 +93,46 @@ public static class BindingCallbacksManagerExtensionMethods
     {
         manager.Bind(actionName, 0, (_, _) => value());
     }
+  
+    /// <summary>
+    /// Binds an array of action names to a <see cref="EventHandler{TEventArgs}"/>.
+    /// </summary>
+    /// <param name="actionName">
+    /// The action name to bind.
+    /// </param>
+    /// <param name="value">
+    /// A reference to a <see cref="EventHandler{TEventArgs}"/> type.
+    /// </param>
+    public static void BindButtonRelease(this BindingCallbacksManager manager, string actionName, Action<BindingData> value)
+    {
+        manager.Bind(actionName, 0, (_, e) =>
+        {
+            if (e.ButtonReleased())
+            {
+                value(e);
+            }
+        });
+    }
+    
+    /// <summary>
+    /// Binds an array of action names to a <see cref="EventHandler{TEventArgs}"/>.
+    /// </summary>
+    /// <param name="actionName">
+    /// The action name to bind.
+    /// </param>
+    /// <param name="value">
+    /// A reference to a <see cref="EventHandler{TEventArgs}"/> type.
+    /// </param>
+    public static void BindButtonPress(this BindingCallbacksManager manager, string actionName, Action<BindingData> value)
+    {
+        manager.Bind(actionName, 0, (_, e) =>
+        {
+            if (e.ButtonPressed())
+            {
+                value(e);
+            }
+        });
+    }
     
     /// <summary>
     /// Binds an array of action names to a <see cref="EventHandler{TEventArgs}"/>.
