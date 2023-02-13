@@ -26,6 +26,18 @@ namespace Codefarts.Input
         /// </summary>
         protected List<BindingData> bindings;
 
+        
+        /// <summary>
+        /// Gets the list of bindings.
+        /// </summary>
+        public IEnumerable<BindingData> Bindings
+        {
+            get
+            {
+                return this.bindings.ToArray();
+            }
+        }
+
         /// <summary>
         /// Gets or sets a list of registered inputSourcesDictionary.
         /// </summary>
