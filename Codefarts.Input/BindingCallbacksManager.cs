@@ -84,7 +84,7 @@ namespace Codefarts.Input
         {
             if (value == null)
             {
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
             }
 
             List<EventHandler<BindingData>> list;
@@ -100,7 +100,7 @@ namespace Codefarts.Input
                 this.Add(key, list);
             }
 
-            //TODO: CHeck if value already added ?
+            // TODO: Check if value already added ?
             list.Add(value);
         }
 
