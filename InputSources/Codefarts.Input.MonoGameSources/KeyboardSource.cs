@@ -8,23 +8,27 @@ namespace Codefarts.Input.MonoGameSources;
 public class KeyboardSource : IInputSource
 {
     private Keys[] keys = Enum.GetValues<Keys>();
+    private PollingData[] results = new PollingData[Enum.GetValues<Keys>().Length];
+    private string name;
 
     public KeyboardSource()
     {
+        this.name = $"Keyboard";
     }
 
     public KeyboardSource(PlayerIndex playerIndex)
     {
         this.PlayerIndex = playerIndex;
+        this.name = $"Keyboard - {this.PlayerIndex}";
     }
 
-    public PlayerIndex PlayerIndex { get; set; } = PlayerIndex.One;
+    public PlayerIndex PlayerIndex { get; } = PlayerIndex.One;
 
     public string Name
     {
         get
         {
-            return $"Keyboard - {this.PlayerIndex}";
+            return this.name;
         }
     }
 
@@ -41,14 +45,13 @@ public class KeyboardSource : IInputSource
     {
         var state = Keyboard.GetState(this.PlayerIndex);
 
-        var results = new List<PollingData>();
-
-        foreach (var key in keys)
+        for (var i = 0; i < this.keys.Length; i++)
         {
-            results.Add(new PollingData(this.Name, key.ToString(), state[key] == KeyState.Down ? 1 : 0)
+            var key = this.keys[i];
+            this.results[i] = new PollingData(this.Name, key.ToString(), state[key] == KeyState.Down ? 1 : 0)
             {
                 DataType = DataType.Button
-            });
+            };
         }
 
         return results;
