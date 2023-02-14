@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2023.2.9.0</Version>
+    <Version>2023.2.13.0</Version>
     <Authors>Dean Lunz</Authors>
     <Copyright>Codefarts</Copyright>
     <RepositoryType>C#</RepositoryType>
@@ -14,14 +14,14 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageProjectUrl>https://github.com/createdbyx/Codefarts.Input.git</PackageProjectUrl>
     <RepositoryUrl>https://github.com/createdbyx/Codefarts.Input.git</RepositoryUrl>
-    <AssemblyVersion>2023.2.9.0</AssemblyVersion>
-    <FileVersion>2023.2.9.0</FileVersion>
+    <AssemblyVersion>2023.2.13.0</AssemblyVersion>
+    <FileVersion>2023.2.13.0</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <AdditionalFiles Include="stylecop.json" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Codefarts.Input" Version="2023.2.7.2" />
+    <PackageReference Include="Codefarts.Input" Version="2023.2.13" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
