@@ -66,7 +66,11 @@ public class GamePadSource : IInputSource
     public IEnumerable<PollingData> Poll()
     {
         var state = GamePad.GetState(this.PlayerIndex);
-
+        
+        // TODO: Change PollingData to a class, then create varibles for each source and store them in the results array, and below we just...
+        // set property values directly from the state info without having to perform a index fetch. PollingData properties other then
+        // value would be get only.
+        
         // buttons
         results[0] = new PollingData(this.name, "X", state.Buttons.X == ButtonState.Pressed ? 1 : 0, DataType.Button);
         results[1] = new PollingData(this.name, "Y", state.Buttons.Y == ButtonState.Pressed ? 1 : 0, DataType.Button);
