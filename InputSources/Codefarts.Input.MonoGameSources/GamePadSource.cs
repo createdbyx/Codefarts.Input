@@ -7,22 +7,27 @@ namespace Codefarts.Input.MonoGameSources;
 
 public class GamePadSource : IInputSource
 {
+    private string name;
+    private PollingData[] results = new PollingData [22];
+
     public GamePadSource()
     {
+        this.name = $"GamePad";
     }
 
-    public GamePadSource(PlayerIndex playerIndex)
+    public GamePadSource(PlayerIndex playerIndex)    
     {
         this.PlayerIndex = playerIndex;
+        this.name = $"GamePad - {this.PlayerIndex}";
     }
 
-    public PlayerIndex PlayerIndex { get; set; } = PlayerIndex.One;
+    public PlayerIndex PlayerIndex { get;  } = PlayerIndex.One;
 
     public string Name
     {
         get
         {
-            return $"GamePad - {this.PlayerIndex}";
+            return this.name;
         }
     }
 
@@ -62,35 +67,33 @@ public class GamePadSource : IInputSource
     {
         var state = GamePad.GetState(this.PlayerIndex);
 
-        var results = new List<PollingData>();
-
         // buttons
-        results.Add(new PollingData(this.Name, "X", state.Buttons.X == ButtonState.Pressed ? 1 : 0){ DataType = DataType.Button});
-        results.Add(new PollingData(this.Name, "Y", state.Buttons.Y == ButtonState.Pressed ? 1 : 0){ DataType = DataType.Button});
-        results.Add(new PollingData(this.Name, "A", state.Buttons.A == ButtonState.Pressed ? 1 : 0){ DataType = DataType.Button});
-        results.Add(new PollingData(this.Name, "B", state.Buttons.B == ButtonState.Pressed ? 1 : 0){ DataType = DataType.Button});
-        results.Add(new PollingData(this.Name, "BigButton", state.Buttons.BigButton == ButtonState.Pressed ? 1 : 0){ DataType = DataType.Button});
-        results.Add(new PollingData(this.Name, "Back", state.Buttons.Back == ButtonState.Pressed ? 1 : 0){ DataType = DataType.Button});
-        results.Add(new PollingData(this.Name, "Start", state.Buttons.Start == ButtonState.Pressed ? 1 : 0){ DataType = DataType.Button});
-        results.Add(new PollingData(this.Name, "LeftShoulder", state.Buttons.LeftShoulder == ButtonState.Pressed ? 1 : 0){ DataType = DataType.Button});
-        results.Add(new PollingData(this.Name, "RightShoulder", state.Buttons.RightShoulder == ButtonState.Pressed ? 1 : 0){ DataType = DataType.Button});
-        results.Add(new PollingData(this.Name, "LeftStick", state.Buttons.LeftStick == ButtonState.Pressed ? 1 : 0){ DataType = DataType.Value});
-        results.Add(new PollingData(this.Name, "RightStick", state.Buttons.RightStick == ButtonState.Pressed ? 1 : 0){ DataType = DataType.Value});
+        results[0] = new PollingData(this.name, "X", state.Buttons.X == ButtonState.Pressed ? 1 : 0, DataType.Button);
+        results[1] = new PollingData(this.name, "Y", state.Buttons.Y == ButtonState.Pressed ? 1 : 0, DataType.Button);
+        results[2] = new PollingData(this.name, "A", state.Buttons.A == ButtonState.Pressed ? 1 : 0, DataType.Button);
+        results[3] = new PollingData(this.name, "B", state.Buttons.B == ButtonState.Pressed ? 1 : 0, DataType.Button);
+        results[4] = new PollingData(this.name, "BigButton", state.Buttons.BigButton == ButtonState.Pressed ? 1 : 0, DataType.Button);
+        results[5] = new PollingData(this.name, "Back", state.Buttons.Back == ButtonState.Pressed ? 1 : 0, DataType.Button);
+        results[6] = new PollingData(this.name, "Start", state.Buttons.Start == ButtonState.Pressed ? 1 : 0, DataType.Button);
+        results[7] = new PollingData(this.name, "LeftShoulder", state.Buttons.LeftShoulder == ButtonState.Pressed ? 1 : 0, DataType.Button);
+        results[8] = new PollingData(this.name, "RightShoulder", state.Buttons.RightShoulder == ButtonState.Pressed ? 1 : 0, DataType.Button);
+        results[9] = new PollingData(this.name, "LeftStick", state.Buttons.LeftStick == ButtonState.Pressed ? 1 : 0, DataType.Value);
+        results[10] = new PollingData(this.name, "RightStick", state.Buttons.RightStick == ButtonState.Pressed ? 1 : 0, DataType.Value);
 
-        results.Add(new PollingData(this.Name, "LeftTrigger", state.Triggers.Left){ DataType = DataType.Value});
-        results.Add(new PollingData(this.Name, "RightTrigger", state.Triggers.Right){ DataType = DataType.Value});
+        results[11] = new PollingData(this.name, "LeftTrigger", state.Triggers.Left, DataType.Value);
+        results[12] = new PollingData(this.name, "RightTrigger", state.Triggers.Right, DataType.Value);
 
-        results.Add(new PollingData(this.Name, "LeftThumbStickX", state.ThumbSticks.Left.X){ DataType = DataType.Value});
-        results.Add(new PollingData(this.Name, "LeftThumbStickY", state.ThumbSticks.Left.Y){ DataType = DataType.Value});
-        results.Add(new PollingData(this.Name, "RightThumbStickX", state.ThumbSticks.Right.X){ DataType = DataType.Value});
-        results.Add(new PollingData(this.Name, "RightThumbStickY", state.ThumbSticks.Right.Y){ DataType = DataType.Value});
+        results[13] = new PollingData(this.name, "LeftThumbStickX", state.ThumbSticks.Left.X, DataType.Value);
+        results[14] = new PollingData(this.name, "LeftThumbStickY", state.ThumbSticks.Left.Y, DataType.Value);
+        results[15] = new PollingData(this.name, "RightThumbStickX", state.ThumbSticks.Right.X, DataType.Value);
+        results[16] = new PollingData(this.name, "RightThumbStickY", state.ThumbSticks.Right.Y, DataType.Value);
+                
+        results[17] = new PollingData(this.name, "IsConnected", state.IsConnected ? 1 : 0, DataType.Other);
 
-        results.Add(new PollingData(this.Name, "IsConnected", state.IsConnected ? 1 : 0){ DataType = DataType.Other});
-
-        results.Add(new PollingData(this.Name, "Right", state.DPad.Right == ButtonState.Pressed ? 1 : 0){ DataType = DataType.Button});
-        results.Add(new PollingData(this.Name, "Left", state.DPad.Left == ButtonState.Pressed ? 1 : 0){ DataType = DataType.Button});
-        results.Add(new PollingData(this.Name, "Up", state.DPad.Up == ButtonState.Pressed ? 1 : 0){ DataType = DataType.Button});
-        results.Add(new PollingData(this.Name, "Down", state.DPad.Down == ButtonState.Pressed ? 1 : 0){ DataType = DataType.Button});
+        results[18] = new PollingData(this.name, "Right", state.DPad.Right == ButtonState.Pressed ? 1 : 0, DataType.Button);
+        results[19] = new PollingData(this.name, "Left", state.DPad.Left == ButtonState.Pressed ? 1 : 0, DataType.Button);
+        results[20] = new PollingData(this.name, "Up", state.DPad.Up == ButtonState.Pressed ? 1 : 0, DataType.Button);
+        results[21] = new PollingData(this.name, "Down", state.DPad.Down == ButtonState.Pressed ? 1 : 0, DataType.Button);
 
         return results;
     }

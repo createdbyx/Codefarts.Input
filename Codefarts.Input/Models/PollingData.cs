@@ -16,6 +16,14 @@ public struct PollingData
         this.DataType = DataType.Other;
     }
 
+    public PollingData(string inputSource, string source, float value, DataType dataType)
+    {
+        this.InputSource = inputSource;
+        this.Source = source;
+        this.Value = value;
+        this.DataType = dataType;
+    }
+
     /// <summary>
     /// Gets or sets the inputSource name or id.
     /// </summary>

@@ -7,8 +7,6 @@
 </copyright>
 */
 
-using System.Data;
-
 namespace Codefarts.Input
 {
     using System;
@@ -72,12 +70,6 @@ namespace Codefarts.Input
                     this.inputSourcesDictionary.RemoveAt(i);
                 }
             }
-            // var sources = this.inputSourcesDictionary.Where(x=>x.Name.Equals(name, StringComparison.InvariantCulture)).ToArray();
-            // foreach (var s in sources)
-            // {
-            //     this.inputSourcesDictionary.Remove(s)
-            // }
-            //this.inputSourcesDictionary.Remove(source.Name);
         }
 
         /// <summary>
@@ -91,9 +83,6 @@ namespace Codefarts.Input
                 lock (sources)
                 {
                     return sources.Select(x => x.Name).ToArray();
-                    // var keys = new string[sources.Count];
-                    // sources.Keys.CopyTo(keys, 0);
-//                    return keys;
                 }
             }
         }
@@ -123,8 +112,6 @@ namespace Codefarts.Input
             }
 
             this.inputSourcesDictionary.Add(inputSource);
-
-            //this.inputSourcesDictionary.Add(inputSource.Name, inputSource);
         }
 
         /// <summary>
@@ -195,30 +182,7 @@ namespace Codefarts.Input
                 throw new ArgumentException("InputSource with the name '" + device.Name + "' not found.");
             }
 
-            // var dev = this.inputSourcesDictionary[device];
-            // var any = false;
-            // foreach (var x in dev.Sources)
-            // {
-            //     if (x.Equals(source))
-            //     {
-            //         any = true;
-            //         break;
-            //     }
-            // }
-            //
-            // if (!any)
-            // {
-            //     throw new Exception(string.Format("InputSource '{0}' does not appear to contain the requested source '{1}'.", device, source));
-            // }
-
             var data = new BindingData(name, device, source, player);
-            // if (!this.bindings.ContainsKey(name))
-            // {
-            //     this.bindings.Add(name, new List<BindingData>());
-            // }
-            //
-            // var list = this.bindings[name]
-            // list.Add(data);
             this.bindings.Add(data);
         }
 
@@ -241,13 +205,8 @@ namespace Codefarts.Input
                 var binding = this.bindings[bindingIndex];
 
                 // check if the binding input source has been polled yet and if not poll it storing the results
-                if (!polledSources.ContainsKey(binding.InputSource))
-                {
-                    polledSources.Add(binding.InputSource, binding.InputSource.Poll());
-                }
-
-                // fetch polled data
-                var polledData = polledSources[binding.InputSource];
+                var polledData = binding.InputSource.Poll();
+                polledSources[binding.InputSource] =  polledData;
 
                 // loop thru each polled data
                 foreach (var data in polledData)
