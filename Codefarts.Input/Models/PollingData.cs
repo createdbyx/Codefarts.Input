@@ -6,7 +6,7 @@
 
 namespace Codefarts.Input.Models;
 
-public struct PollingData
+public class PollingData
 {
     public PollingData(string inputSource, string source, float value)
     {
@@ -38,7 +38,7 @@ public struct PollingData
     /// <summary>
     /// Gets or sets the value return from the inputSource.
     /// </summary>
-    public float Value { get; }
+    public float Value { get; set; }
 
-    public DataType DataType { get; set; }
+    public DataType DataType { get;   }
 }

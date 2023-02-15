@@ -4,12 +4,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageVersion>2023.2.14.10</PackageVersion>
+    <PackageVersion>2023.2.15.6</PackageVersion>
     <Authors>Dean Lunz</Authors>
     <Copyright>Codefarts</Copyright>
     <Company>Codefarts</Company>
-    <AssemblyVersion>2023.2.14.10</AssemblyVersion>
-    <FileVersion>2023.2.14.10</FileVersion>
+    <AssemblyVersion>2023.2.15.6</AssemblyVersion>
+    <FileVersion>2023.2.15.6</FileVersion>
     <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <RepositoryType>C#</RepositoryType>
     <IncludeSymbols>true</IncludeSymbols>

@@ -24,7 +24,7 @@ namespace Codefarts.Input
         /// </summary>
         protected List<BindingData> bindings;
 
-        
+
         /// <summary>
         /// Gets the list of bindings.
         /// </summary>
@@ -40,6 +40,8 @@ namespace Codefarts.Input
         /// Gets or sets a list of registered inputSourcesDictionary.
         /// </summary>
         protected List<IInputSource> inputSourcesDictionary;
+
+        private Dictionary<IInputSource, IEnumerable<PollingData>> polledSources = new Dictionary<IInputSource, IEnumerable<PollingData>>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InputManager"/> class. 
@@ -197,22 +199,34 @@ namespace Codefarts.Input
             {
                 return;
             }
+
+            // TODO This code is horribly not optimized and needs alot of work
             
-            var polledSources = new Dictionary<IInputSource, IEnumerable<PollingData>>();
+            // clear previous polling data because we are starting a new polling run
+            polledSources.Clear();
+            polledSources = new Dictionary<IInputSource, IEnumerable<PollingData>>();
             for (var bindingIndex = 0; bindingIndex < this.bindings.Count; bindingIndex++)
             {
                 // get the binding
                 var binding = this.bindings[bindingIndex];
 
-                // check if the binding input source has been polled yet and if not poll it storing the results
-                var polledData = binding.InputSource.Poll();
-                polledSources[binding.InputSource] =  polledData;
+                // if binding input source not already polled and poll and cache polling data
+                IEnumerable<PollingData> polledData = null;
+                if (!polledSources.ContainsKey(binding.InputSource))
+                {
+                    // check if the binding input source has been polled yet and if not poll it storing the results
+                    polledData = binding.InputSource.Poll();
+                    polledSources[binding.InputSource] = polledData;
+                }
+
+                // if no polling data it was polled previously so fetch the previously polled data from the cache
+                polledData ??= polledSources[binding.InputSource];
 
                 // loop thru each polled data
-                foreach (var data in polledData)
+                foreach (var pData in polledData)
                 {
                     // if the sources do not match skip it
-                    if (!data.Source.Equals(binding.Source, StringComparison.InvariantCulture))
+                    if (!pData.Source.Equals(binding.Source, StringComparison.InvariantCulture))
                     {
                         continue;
                     }
@@ -221,7 +235,7 @@ namespace Codefarts.Input
                     binding.TotalTime = totalTime;
                     binding.ElapsedTime = elapsedTime;
                     binding.PreviousValue = binding.Value;
-                    binding.Value = data.Value;
+                    binding.Value = pData.Value;
 
                     // update binding data
                     this.bindings[bindingIndex] = binding;
@@ -230,6 +244,6 @@ namespace Codefarts.Input
                     handler.Invoke(this, binding);
                 }
             }
-        } 
+        }
     }
 }
