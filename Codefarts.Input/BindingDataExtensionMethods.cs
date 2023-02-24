@@ -6,11 +6,11 @@ public static class BindingDataExtensionMethods
 {
     public static bool ButtonReleased(this BindingData data)
     {
-        return data.PreviousValue == 1 && data.Value == 0;
+        return data.DataType == DataType.Button && data.PreviousValue == 1 && data.Value == 0;
     }
 
     public static bool ButtonPressed(this BindingData data)
     {
-        return data.PreviousValue == 0 && data.Value == 1;
+        return data.DataType == DataType.Button && data.PreviousValue == 0 && data.Value == 1;
     }
 }
