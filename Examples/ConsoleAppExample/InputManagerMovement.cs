@@ -19,7 +19,7 @@ class InputManagerMovement
         var inputManager = new InputManager();
         var inputSource = new ConsoleInputSource();
 
-        inputManager.AddSource(inputSource);
+        inputManager.InputSources.Add(inputSource);
         inputManager.Bind("MoveUp", inputSource, "W");
         inputManager.Bind("MoveDown", inputSource, "S");
         inputManager.Bind("MoveLeft", inputSource, "A");
