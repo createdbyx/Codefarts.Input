@@ -7,243 +7,129 @@
 </copyright>
 */
 
-namespace Codefarts.Input
+namespace Codefarts.Input;
+
+using System;
+using System.Collections.Generic;
+using Interfaces;
+using Models;
+
+/// <summary>
+/// The input manager is used to handle inputSource state changes.
+/// </summary>
+public class InputManager
 {
-    using System;
-    using System.Collections.Generic;
-    using Interfaces;
-    using Models;
+    /// <summary>
+    /// Holds a collection of objects the implement the IBinder interface.
+    /// </summary>
+    protected BindingsCollection bindings;
 
     /// <summary>
-    /// The input manager is used to handle inputSource state changes.
+    /// Gets or sets a list of registered input sources.
     /// </summary>
-    public class InputManager
+    protected InputSourceCollection inputSourcesList;
+
+    private Dictionary<IInputSource, IEnumerable<PollingData>> polledSources = new Dictionary<IInputSource, IEnumerable<PollingData>>();
+
+    /// <summary>
+    /// Gets the list of bindings.
+    /// </summary>
+    public BindingsCollection Bindings
     {
-        /// <summary>
-        /// Holds a collection of objects the implement the IBinder interface.
-        /// </summary>
-        protected List<BindingData> bindings;
-
-
-        /// <summary>
-        /// Gets the list of bindings.
-        /// </summary>
-        public IEnumerable<BindingData> Bindings
+        get
         {
-            get
-            {
-                return this.bindings.ToArray();
-            }
+            return this.bindings;
+        }
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="InputManager"/> class.
+    /// </summary>
+    public InputManager()
+    {
+        this.bindings = new BindingsCollection(this);
+        this.inputSourcesList = new InputSourceCollection(this);
+    }
+
+    /// <summary>
+    /// The Action event is raised every time a user inputSource change is detected and it matches a binding.
+    /// </summary>
+    public event EventHandler<BindingData> Action;
+
+    /// <summary>
+    /// Gets the collection os registered input sources.
+    /// </summary>
+    public InputSourceCollection InputSources
+    {
+        get
+        {
+            return this.inputSourcesList;
+        }
+    }
+
+    /// <summary>
+    /// Iterates through all bindings and polls any input sources that need polling.
+    /// </summary>
+    /// <remarks>Input sources are only polled once per update call.</remarks>
+    public virtual void Update(TimeSpan totalTime, TimeSpan elapsedTime)
+    {
+        // group bindings by their input source
+        var handler = this.Action;
+        if (handler == null)
+        {
+            // no need to contunue if no handler
+            return;
         }
 
-        /// <summary>
-        /// Gets or sets a list of registered inputSourcesDictionary.
-        /// </summary>
-        protected List<IInputSource> inputSourcesDictionary;
-
-        private Dictionary<IInputSource, IEnumerable<PollingData>> polledSources = new Dictionary<IInputSource, IEnumerable<PollingData>>();
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InputManager"/> class. 
-        /// </summary>
-        public InputManager()
+        // clear previous polling data because we are starting a new polling run
+        polledSources.Clear();
+        for (var bindingIndex = 0; bindingIndex < this.bindings.Count; bindingIndex++)
         {
-            this.bindings = new List<BindingData>();
-            this.inputSourcesDictionary = new List<IInputSource>();
-        }
+            // get the binding
+            var binding = this.bindings[bindingIndex];
 
-        /// <summary>
-        /// Removes the inputSource using the inputSourcesDictionary name.
-        /// </summary>
-        /// <param name="name">The name of the inputSource to remove.</param>
-        /// <exception cref="System.ArgumentException">InputSource name is null or missing.;name</exception>
-        public virtual void RemoveSource(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name?.Trim()))
+            // if binding input source not already polled then poll and cache polling data
+            IEnumerable<PollingData> polledData = null;
+            if (!polledSources.ContainsKey(binding.InputSource))
             {
-                throw new ArgumentException("InputSource name is null or missing.", "name");
+                // poll binding input source and store the results for this update
+                polledData = binding.InputSource.Poll(this.PollOnlyStateChanges);
+                polledSources[binding.InputSource] = polledData;
             }
 
-            for (int i = this.inputSourcesDictionary.Count - 1; i >= 0; i--)
+            // if no polling data it was polled previously so fetch the previously polled data from the cache
+            polledData ??= polledSources[binding.InputSource];
+
+            // loop thru each polled data
+            foreach (var pData in polledData)
             {
-                var entry = this.inputSourcesDictionary[i];
-                if (entry.Name.Equals(name, StringComparison.InvariantCulture))
+                // if the sources do not match skip it
+                if (!pData.Source.Equals(binding.Source, StringComparison.InvariantCulture))
                 {
-                    this.inputSourcesDictionary.RemoveAt(i);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets the names of the inputSourcesDictionary that have been added.
-        /// </summary>
-        public virtual string[] Sources
-        {
-            get
-            {
-                var sources = this.inputSourcesDictionary;
-                lock (sources)
-                {
-                    return sources.Select(x => x.Name).ToArray();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Adds the inputSource.
-        /// </summary>
-        /// <param name="inputSource">The inputSource to add.</param>
-        /// <exception cref="System.ArgumentNullException">inputSource</exception>
-        /// <exception cref="System.ArgumentException">InputSource name is null or missing.;inputSource</exception>
-        /// <remarks>Can not add the same inputSource twice.</remarks>
-        public virtual void AddSource(IInputSource inputSource)
-        {
-            if (inputSource == null)
-            {
-                throw new ArgumentNullException(nameof(inputSource));
-            }
-
-            if (string.IsNullOrWhiteSpace(inputSource.Name))
-            {
-                throw new ArgumentException("Input source name is null or missing.", nameof(inputSource));
-            }
-
-            if (this.inputSourcesDictionary.Any(x => x.Name.Equals(inputSource.Name, StringComparison.InvariantCulture)))
-            {
-                throw new ArgumentException("Input source with same name already added.");
-            }
-
-            this.inputSourcesDictionary.Add(inputSource);
-        }
-
-        /// <summary>
-        /// The Action event is raised every time a user inputSource change is detected and it matches a binding.
-        /// </summary>
-        public event EventHandler<BindingData> Action;
-
-        /// <summary>
-        /// Gets the number of inputSourcesDictionary that have been added.
-        /// </summary>
-        public virtual int NumberOfInputSources
-        {
-            get
-            {
-                return this.inputSourcesDictionary.Count;
-            }
-        }
-
-        /// <summary>
-        /// Unbinds a binding.
-        /// </summary>
-        /// <param name="name">The name of the binding to unbind. See remarks for more info.</param>
-        /// <remarks>
-        /// The name parameter is case sensitive.
-        /// </remarks>
-        public virtual void Unbind(string name)
-        {
-            BindingData bindingData;
-            //var list = this.bindings[name];
-            for (int i = this.bindings.Count - 1; i >= 0; i--)
-            {
-                bindingData = this.bindings[i];
-                if (bindingData.Name.Equals(name, StringComparison.InvariantCulture))
-                {
-                    this.bindings.RemoveAt(i);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Unbinds all bindings.
-        /// </summary>
-        public virtual void UnbindAll()
-        {
-            this.bindings.Clear();
-        }
-
-        /// <summary>
-        /// Binds the specified name to a inputSource and inputSource source.
-        /// </summary>
-        /// <param name="name">The name of the binder.</param>
-        /// <param name="device">The inputSource name.</param>
-        /// <param name="source">The source name on the inputSource.</param>
-        /// <param name="pressState">The pressed state if the inputSource source is a button.</param>
-        /// <param name="player">The player id associated with the binding.</param>
-        /// <remarks>
-        /// The name parameter is case sensitive.
-        /// </remarks>
-        public virtual void Bind(string name, IInputSource device, string source, int player)
-        {
-            if (device == null)
-            {
-                throw new ArgumentNullException(nameof(device));
-            }
-
-            if (!this.inputSourcesDictionary.Any(x => x.Name.Equals(device.Name, StringComparison.InvariantCulture)))
-            {
-                throw new ArgumentException("InputSource with the name '" + device.Name + "' not found.");
-            }
-
-            var data = new BindingData(name, device, source, player);
-            this.bindings.Add(data);
-        }
-
-        /// <summary>
-        /// Polls all inputSourcesDictionary that have been added to the InputManager.
-        /// </summary>       
-        public virtual void Update(TimeSpan totalTime, TimeSpan elapsedTime)
-        {
-            // group bindings by their input source 
-            var handler = this.Action;
-            if (handler == null)
-            {
-                return;
-            }
-
-            // TODO This code is horribly not optimized and needs alot of work
-            
-            // clear previous polling data because we are starting a new polling run
-            polledSources.Clear();
-            polledSources = new Dictionary<IInputSource, IEnumerable<PollingData>>();
-            for (var bindingIndex = 0; bindingIndex < this.bindings.Count; bindingIndex++)
-            {
-                // get the binding
-                var binding = this.bindings[bindingIndex];
-
-                // if binding input source not already polled and poll and cache polling data
-                IEnumerable<PollingData> polledData = null;
-                if (!polledSources.ContainsKey(binding.InputSource))
-                {
-                    // check if the binding input source has been polled yet and if not poll it storing the results
-                    polledData = binding.InputSource.Poll();
-                    polledSources[binding.InputSource] = polledData;
+                    continue;
                 }
 
-                // if no polling data it was polled previously so fetch the previously polled data from the cache
-                polledData ??= polledSources[binding.InputSource];
+                // otherwise update the binding values
+                binding.TotalTime = totalTime;
+                binding.ElapsedTime = elapsedTime;
+                binding.PreviousValue = binding.Value;
+                binding.Value = pData.Value;
+                binding.DataType = pData.DataType;
+                binding.Minimum = pData.Minimum;
+                binding.Maximum = pData.Maximum;
 
-                // loop thru each polled data
-                foreach (var pData in polledData)
-                {
-                    // if the sources do not match skip it
-                    if (!pData.Source.Equals(binding.Source, StringComparison.InvariantCulture))
-                    {
-                        continue;
-                    }
+                // update binding data
+                this.bindings[bindingIndex] = binding;
 
-                    // otherwise update the binding values
-                    binding.TotalTime = totalTime;
-                    binding.ElapsedTime = elapsedTime;
-                    binding.PreviousValue = binding.Value;
-                    binding.Value = pData.Value;
-
-                    // update binding data
-                    this.bindings[bindingIndex] = binding;
-
-                    // raise action event
-                    handler.Invoke(this, binding);
-                }
+                // raise action event
+                handler.Invoke(this, binding);
             }
         }
     }
+
+    /// <summary>
+    /// Gets or sets weather polling input sources should return only state changes since last polling.
+    /// </summary>
+    /// <remarks>Default is true.</remarks>
+    public bool PollOnlyStateChanges { get; set; } = true;
 }
