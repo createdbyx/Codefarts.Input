@@ -16,6 +16,7 @@ namespace Codefarts.Input.Models
     /// <summary>
     /// Provides a class for binding information.
     /// </summary>
+  [Serializable]
     public struct BindingData
     {
         /// <summary>
@@ -37,6 +38,8 @@ namespace Codefarts.Input.Models
             this.TotalTime = default;
             this.ElapsedTime = default;
             this.DataType = DataType.Other;
+            this.Minimum = 0;
+            this.Maximum = 0;
         }
 
         /// <summary>
@@ -108,5 +111,7 @@ namespace Codefarts.Input.Models
 
         public TimeSpan TotalTime { get; set; }
         public TimeSpan ElapsedTime { get; set; }
+        public float Minimum { get; set; }
+        public float Maximum { get; set; }
     }
 }

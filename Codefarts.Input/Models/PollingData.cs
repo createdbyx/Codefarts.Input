@@ -8,7 +8,7 @@ namespace Codefarts.Input.Models;
 
 public class PollingData
 {
-    public PollingData(string inputSource, string source, float value)
+    public PollingData(string inputSource, string source, float value ,float min,float max)
     {
         this.InputSource = inputSource;
         this.Source = source;
@@ -16,7 +16,7 @@ public class PollingData
         this.DataType = DataType.Other;
     }
 
-    public PollingData(string inputSource, string source, float value, DataType dataType)
+    public PollingData(string inputSource, string source, float value, float min,float max, DataType dataType)
     {
         this.InputSource = inputSource;
         this.Source = source;
@@ -40,5 +40,8 @@ public class PollingData
     /// </summary>
     public float Value { get; set; }
 
-    public DataType DataType { get;   }
+    public DataType DataType { get; }
+
+    public float Minimum { get;  }
+    public float Maximum { get;  }
 }
