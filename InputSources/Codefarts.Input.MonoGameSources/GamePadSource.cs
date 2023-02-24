@@ -9,6 +9,7 @@ public class GamePadSource : IInputSource
 {
     private string name;
     private PollingData[] results = new PollingData [22];
+    private List<PollingData> resultsToReturn = new List<PollingData>();
 
     private PollingData buttonXData;
     private PollingData buttonYData;
@@ -93,70 +94,93 @@ public class GamePadSource : IInputSource
         }
     }
 
-    public IEnumerable<PollingData> Poll()
+    public IEnumerable<PollingData> Poll(bool onlyStateChanges)
     {
         GamePadState state = GamePad.GetState(this.PlayerIndex);
+                     
+        this.resultsToReturn.Clear();
 
-        // buttons
-        this.buttonXData.Value = state.Buttons.X == ButtonState.Pressed ? 1 : 0;
-        this.buttonYData.Value = state.Buttons.Y == ButtonState.Pressed ? 1 : 0;
-        this.buttonAData.Value = state.Buttons.A == ButtonState.Pressed ? 1 : 0;
-        this.buttonBData.Value = state.Buttons.B == ButtonState.Pressed ? 1 : 0;
-        this.buttonBigData.Value = state.Buttons.BigButton == ButtonState.Pressed ? 1 : 0;
-        this.buttonBackData.Value = state.Buttons.Back == ButtonState.Pressed ? 1 : 0;
-        this.buttonStartData.Value = state.Buttons.Start == ButtonState.Pressed ? 1 : 0;
-        this.buttonLeftSholderData.Value = state.Buttons.LeftShoulder == ButtonState.Pressed ? 1 : 0;
-        this.buttonRIghtShoulderData.Value = state.Buttons.RightShoulder == ButtonState.Pressed ? 1 : 0;
-        this.buttonLeftStickData.Value = state.Buttons.LeftStick == ButtonState.Pressed ? 1 : 0;
-        this.buttonRightStickData.Value = state.Buttons.RightStick == ButtonState.Pressed ? 1 : 0;
+        ButtonCheck(onlyStateChanges, this.buttonXData, state.Buttons.X);
+        ButtonCheck(onlyStateChanges, this.buttonYData, state.Buttons.Y);
+        ButtonCheck(onlyStateChanges, this.buttonAData, state.Buttons.A);
+        ButtonCheck(onlyStateChanges, this.buttonBData, state.Buttons.B);
+        ButtonCheck(onlyStateChanges, this.buttonBigData, state.Buttons.BigButton);
+        ButtonCheck(onlyStateChanges, this.buttonBackData, state.Buttons.Back);
+        ButtonCheck(onlyStateChanges, this.buttonStartData, state.Buttons.Start);
+        ButtonCheck(onlyStateChanges, this.buttonLeftSholderData, state.Buttons.LeftShoulder);
+        ButtonCheck(onlyStateChanges, this.buttonRIghtShoulderData, state.Buttons.RightShoulder);
+        ButtonCheck(onlyStateChanges, this.buttonLeftStickData, state.Buttons.LeftStick);
+        ButtonCheck(onlyStateChanges, this.buttonRightStickData, state.Buttons.RightStick);
 
-        this.leftTriggerData.Value = state.Triggers.Left;
-        this.rightTriggerData.Value = state.Triggers.Right;
+        ValueCheck(onlyStateChanges, this.leftTriggerData, state.Triggers.Left);
+        ValueCheck(onlyStateChanges, this.rightTriggerData, state.Triggers.Right);
 
-        this.leftThumbStickXData.Value = state.ThumbSticks.Left.X;
-        this.leftThumbStickYData.Value = state.ThumbSticks.Left.Y;
-        this.rightThumbStickXData.Value = state.ThumbSticks.Right.X;
-        this.rightThumbStickYData.Value = state.ThumbSticks.Right.Y;
+        ValueCheck(onlyStateChanges, this.leftThumbStickYData, state.ThumbSticks.Left.Y);
+        ValueCheck(onlyStateChanges, this.rightThumbStickXData, state.ThumbSticks.Right.X);
+        ValueCheck(onlyStateChanges, this.leftThumbStickXData, state.ThumbSticks.Left.X);
+        ValueCheck(onlyStateChanges, this.rightThumbStickYData, state.ThumbSticks.Right.Y);
 
-        this.isConnectedData.Value = state.IsConnected ? 1 : 0;
+        ValueCheck(onlyStateChanges, this.isConnectedData, state.IsConnected ? 1 : 0);
 
-        this.dpadRight.Value = state.DPad.Right == ButtonState.Pressed ? 1 : 0;
-        this.dpadLeft.Value = state.DPad.Left == ButtonState.Pressed ? 1 : 0;
-        this.dpadUp.Value = state.DPad.Up == ButtonState.Pressed ? 1 : 0;
-        this.dpadDown.Value = state.DPad.Down == ButtonState.Pressed ? 1 : 0;
+        ButtonCheck(onlyStateChanges, this.dpadRight, state.DPad.Right);
+        ButtonCheck(onlyStateChanges, this.dpadLeft, state.DPad.Left);
+        ButtonCheck(onlyStateChanges, this.dpadUp, state.DPad.Up);
+        ButtonCheck(onlyStateChanges, this.dpadDown, state.DPad.Down);
 
-        return this.results;
+        return this.resultsToReturn;
+    }
+
+    private void ValueCheck(bool onlyStateChanges, PollingData pollingData, float value)
+    {
+        var oldValue = pollingData.Value;
+        var newValue = value;
+        if (!onlyStateChanges || (onlyStateChanges && oldValue != newValue))
+        {
+            pollingData.Value = newValue;
+            this.resultsToReturn.Add(pollingData);
+        }
+    }
+
+    private void ButtonCheck(bool onlyStateChanges, PollingData pollingData, ButtonState state)
+    {
+        var oldValue = pollingData.Value;
+        var newValue = state == ButtonState.Pressed ? 1 : 0;
+        if (!onlyStateChanges || (onlyStateChanges && oldValue != newValue))
+        {
+            pollingData.Value = newValue;
+            this.resultsToReturn.Add(pollingData);
+        }
     }
 
     private void InitPollingData()
     {
         // build polling data
-        this.buttonXData = new PollingData(this.name, "X", 0, DataType.Button);
-        this.buttonYData = new PollingData(this.name, "Y", 0, DataType.Button);
-        this.buttonAData = new PollingData(this.name, "A", 0, DataType.Button);
-        this.buttonBData = new PollingData(this.name, "B", 0, DataType.Button);
-        this.buttonBigData = new PollingData(this.name, "BigButton", 0, DataType.Button);
-        this.buttonBackData = new PollingData(this.name, "Back", 0, DataType.Button);
-        this.buttonStartData = new PollingData(this.name, "Start", 0, DataType.Button);
-        this.buttonLeftSholderData = new PollingData(this.name, "LeftShoulder", 0, DataType.Button);
-        this.buttonRIghtShoulderData = new PollingData(this.name, "RightShoulder", 0, DataType.Button);
-        this.buttonLeftStickData = new PollingData(this.name, "LeftStick", 0, DataType.Button);
-        this.buttonRightStickData = new PollingData(this.name, "RightStick", 0, DataType.Button);
+        this.buttonXData = new PollingData(this.name, "X", 0, 0, 1, DataType.Button);
+        this.buttonYData = new PollingData(this.name, "Y", 0, 0, 1, DataType.Button);
+        this.buttonAData = new PollingData(this.name, "A", 0, 0, 1, DataType.Button);
+        this.buttonBData = new PollingData(this.name, "B", 0, 0, 1, DataType.Button);
+        this.buttonBigData = new PollingData(this.name, "BigButton", 0, 0, 1, DataType.Button);
+        this.buttonBackData = new PollingData(this.name, "Back", 0, 0, 1, DataType.Button);
+        this.buttonStartData = new PollingData(this.name, "Start", 0, 0, 1, DataType.Button);
+        this.buttonLeftSholderData = new PollingData(this.name, "LeftShoulder", 0, 0, 1, DataType.Button);
+        this.buttonRIghtShoulderData = new PollingData(this.name, "RightShoulder", 0, 0, 1, DataType.Button);
+        this.buttonLeftStickData = new PollingData(this.name, "LeftStick", 0, 0, 1, DataType.Button);
+        this.buttonRightStickData = new PollingData(this.name, "RightStick", 0, 0, 1, DataType.Button);
 
-        this.leftTriggerData = new PollingData(this.name, "LeftTrigger", 0, DataType.Value);
-        this.rightTriggerData = new PollingData(this.name, "RightTrigger", 0, DataType.Value);
+        this.leftTriggerData = new PollingData(this.name, "LeftTrigger", 0, -1, 1, DataType.Value);
+        this.rightTriggerData = new PollingData(this.name, "RightTrigger", 0, -1, 1, DataType.Value);
 
-        this.leftThumbStickXData = new PollingData(this.name, "LeftThumbStickX", 0, DataType.Value);
-        this.leftThumbStickYData = new PollingData(this.name, "LeftThumbStickY", 0, DataType.Value);
-        this.rightThumbStickXData = new PollingData(this.name, "RightThumbStickX", 0, DataType.Value);
-        this.rightThumbStickYData = new PollingData(this.name, "RightThumbStickY", 0, DataType.Value);
+        this.leftThumbStickXData = new PollingData(this.name, "LeftThumbStickX", 0, -1, 1, DataType.Value);
+        this.leftThumbStickYData = new PollingData(this.name, "LeftThumbStickY", 0, -1, 1, DataType.Value);
+        this.rightThumbStickXData = new PollingData(this.name, "RightThumbStickX", 0, -1, 1, DataType.Value);
+        this.rightThumbStickYData = new PollingData(this.name, "RightThumbStickY", 0, -1, 1, DataType.Value);
 
-        this.isConnectedData = new PollingData(this.name, "IsConnected", 0, DataType.Other);
+        this.isConnectedData = new PollingData(this.name, "IsConnected", 0, 0, 1, DataType.Other);
 
-        this.dpadRight = new PollingData(this.name, "Right", 0, DataType.Button);
-        this.dpadLeft = new PollingData(this.name, "Left", 0, DataType.Button);
-        this.dpadUp = new PollingData(this.name, "Up", 0, DataType.Button);
-        this.dpadDown = new PollingData(this.name, "Down", 0, DataType.Button);
+        this.dpadRight = new PollingData(this.name, "Right", 0, 0, 1, DataType.Button);
+        this.dpadLeft = new PollingData(this.name, "Left", 0, 0, 1, DataType.Button);
+        this.dpadUp = new PollingData(this.name, "Up", 0, 0, 1, DataType.Button);
+        this.dpadDown = new PollingData(this.name, "Down", 0, 0, 1, DataType.Button);
 
 
         // store results cache

@@ -5,13 +5,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2023.2.15.1</Version>
+    <Version>2023.2.23.2</Version>
     <Authors>Dean Lunz</Authors>
     <Copyright>Codefarts</Copyright>
     <RepositoryType>C#</RepositoryType>
     <Company>Codefarts</Company>
-    <AssemblyVersion>2023.2.15.1</AssemblyVersion>
-    <FileVersion>2023.2.15.1</FileVersion>
+    <AssemblyVersion>2023.2.23.2</AssemblyVersion>
+    <FileVersion>2023.2.23.2</FileVersion>
     <IncludeSymbols>true</IncludeSymbols>
     <DebugSymbols>true</DebugSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -19,7 +19,7 @@
     <RepositoryUrl>https://github.com/createdbyx/Codefarts.Input.git</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Codefarts.Input" Version="2023.2.14.10" />
+    <PackageReference Include="Codefarts.Input" Version="2023.2.20.110" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
