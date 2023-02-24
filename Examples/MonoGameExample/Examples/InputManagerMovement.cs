@@ -15,12 +15,12 @@ public class InputManagerMovement : DrawableGameComponent
     private SpriteBatch spriteBatch;
     private Vector2 position = Vector2.One * 100;
     private float rotation = MathHelper.ToRadians(0);
-    private float rotationSpeed = 0.25f;
-    private float movementSpeed = 0.5f;
+    private float maxRotationSpeed = 300f;
+    private float maxMovementSpeed = 400f;
     private InputManager inputManager;
     private BindingCallbacksManager callbacksManager;
     private float rotationDelta;
-    private float speed;
+    private float speedDelta;
 
     public InputManagerMovement(Game game) : base(game)
     {
@@ -33,8 +33,8 @@ public class InputManagerMovement : DrawableGameComponent
         var kbSource = new KeyboardSource();
         var gpSource = new GamePadSource();
 
-        inputManager.AddSource(kbSource);
-        inputManager.AddSource(gpSource);
+        inputManager.InputSources.Add(kbSource);
+        inputManager.InputSources.Add(gpSource);
         inputManager.Bind("MoveForward", kbSource, "W");
         inputManager.Bind("MoveBackward", kbSource, "S");
         inputManager.Bind("MoveForward", gpSource, "RightTrigger");
@@ -63,41 +63,27 @@ public class InputManagerMovement : DrawableGameComponent
 
     private void MoveForward(BindingData bindingData)
     {
-        var directionVector = new Vector2(MathF.Sin(this.rotation), MathF.Cos(this.rotation));
-        directionVector.Normalize();
-        this.speed = bindingData.Value * this.movementSpeed;
-        var directionDeta = (directionVector * this.speed) * bindingData.ElapsedTime.Milliseconds;
-        this.position = Vector2.Subtract(this.position, directionDeta);
+        this.speedDelta += -bindingData.RelativeValue;
     }
 
     private void MoveBackward(BindingData bindingData)
     {
-        var directionVector = new Vector2(MathF.Sin(this.rotation), MathF.Cos(this.rotation));
-        directionVector.Normalize();
-        this.speed = bindingData.Value * this.movementSpeed;
-        var directionDeta = (directionVector * this.speed) * bindingData.ElapsedTime.Milliseconds;
-        this.position = Vector2.Add(this.position, directionDeta);
+        this.speedDelta += bindingData.RelativeValue;
     }
 
     private void DoTurn(BindingData bindingData)
     {
-        var speed = bindingData.Value * this.rotationSpeed;
-        this.rotationDelta = MathHelper.ToRadians(speed) * bindingData.ElapsedTime.Milliseconds;
-        this.rotation -= this.rotationDelta;
+        this.rotationDelta += MathHelper.ToRadians(-bindingData.RelativeValue);
     }
 
     private void TurnLeft(BindingData bindingData)
     {
-        var speed = bindingData.Value * this.rotationSpeed;
-        this.rotationDelta = MathHelper.ToRadians(speed) * bindingData.ElapsedTime.Milliseconds;
-        this.rotation += this.rotationDelta;
+        this.rotationDelta += MathHelper.ToRadians(bindingData.RelativeValue);
     }
 
     private void TurnRight(BindingData bindingData)
     {
-        var speed = bindingData.Value * this.rotationSpeed;
-        this.rotationDelta = MathHelper.ToRadians(speed) * bindingData.ElapsedTime.Milliseconds;
-        this.rotation -= rotationDelta;
+        this.rotationDelta += MathHelper.ToRadians(-bindingData.RelativeValue);
     }
 
     protected override void LoadContent()
@@ -119,6 +105,16 @@ public class InputManagerMovement : DrawableGameComponent
     public override void Update(GameTime gameTime)
     {
         inputManager.Update(gameTime.TotalGameTime, gameTime.ElapsedGameTime);
+
+        var rotationAmmount = Math.Clamp(this.rotationDelta * this.maxRotationSpeed, -this.maxRotationSpeed, this.maxRotationSpeed);
+        this.rotation += (float)(rotationAmmount * gameTime.ElapsedGameTime.TotalSeconds);
+
+        var directionVector = new Vector2(MathF.Sin(this.rotation), MathF.Cos(this.rotation));
+        directionVector.Normalize();
+
+        var movementSpeed = Math.Clamp(this.speedDelta * this.maxMovementSpeed, -this.maxMovementSpeed, this.maxMovementSpeed);
+        var distanceVector = directionVector * (float)(movementSpeed * gameTime.ElapsedGameTime.TotalSeconds);
+        this.position += distanceVector;
     }
 
     private void Exit()
