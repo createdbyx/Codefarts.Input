@@ -13,7 +13,7 @@ public class KeyboardSourcePerfTests
 
         for (var i = 0; i < 100000; i++)
         {
-            var results = kbSource.Poll();
+            var results = kbSource.Poll(false);
         }
     }
 }

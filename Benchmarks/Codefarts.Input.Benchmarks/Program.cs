@@ -34,7 +34,7 @@ public class Md5VsSha256
 
         for (var i = 0; i < 100000; i++)
         {
-            var results = kbSource.Poll();
+            var results = kbSource.Poll(false);
         }
     }
 }
