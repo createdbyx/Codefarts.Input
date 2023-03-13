@@ -21,6 +21,18 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Codefarts.Input.BindingsReadersWriters\Codefarts.Input.BindingsReadersWriters.csproj" />
       <ProjectReference Include="..\InputSources\Codefarts.Input.MonoGameSources\Codefarts.Input.MonoGameSources.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="TestData\BadRootBindings.xml" />
+      <Content Include="TestData\BadRootBindings.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="TestData\TestBindings.xml" />
+      <Content Include="TestData\TestBindings.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 </Project>
