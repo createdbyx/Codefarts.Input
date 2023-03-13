@@ -21,4 +21,12 @@ public class BindingsCollection : ObservableCollection<BindingData>
 
         base.InsertItem(index, item);
     }
+
+    public void AddRange(IEnumerable<BindingData> bindings)
+    {
+        foreach (var data in bindings)
+        {
+            this.Add(data);
+        }
+    }
 }
