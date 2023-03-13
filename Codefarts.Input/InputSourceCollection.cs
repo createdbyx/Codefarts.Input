@@ -53,7 +53,7 @@ public class InputSourceCollection : ObservableCollection<IInputSource>
         {
             if (!this.inputManager.Bindings.Any(x => x.InputSource == item))
             {
-                throw new  ArgumentException($"Can not clear input sources because there are bindings in the Bondings collection that reference '{item.Name}'.");
+                throw new  ArgumentException($"Can not clear input sources because there are bindings in the Bindings collection that reference '{item.Name}'.");
             }
         }        
         
