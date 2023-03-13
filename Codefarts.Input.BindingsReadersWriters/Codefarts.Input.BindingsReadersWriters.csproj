@@ -6,21 +6,30 @@
     <Nullable>enable</Nullable>
     <LangVersion>default</LangVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2023.2.24.1</Version>
+    <Version>2023.3.10.0</Version>
     <Authors>Dean Lunz</Authors>
     <Copyright>Codefarts</Copyright>
     <PackageProjectUrl>https://github.com/createdbyx/Codefarts.Input.git</PackageProjectUrl>
     <RepositoryUrl>https://github.com/createdbyx/Codefarts.Input.git</RepositoryUrl>
     <RepositoryType>C#</RepositoryType>
     <Company>Codefarts</Company>
-    <AssemblyVersion>2023.2.24.1</AssemblyVersion>
-    <FileVersion>2023.2.24.1</FileVersion>
+    <AssemblyVersion>2023.3.10.0</AssemblyVersion>
+    <FileVersion>2023.3.10.0</FileVersion>
     <IncludeSymbols>true</IncludeSymbols>
     <DebugSymbols>true</DebugSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Codefarts.Input" Version="2023.2.23" />
+    <PackageReference Include="Codefarts.Input" Version="2023.2.24.6" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="..\Codefarts.Input\stylecop.json">
+      <Link>stylecop.json</Link>
+    </AdditionalFiles>
   </ItemGroup>
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="buildhelper &quot;-b:$(ProjectDir)$(ConfigurationName)-PreBuild.xml&quot; &quot;-p:$(ProjectPath)&quot; &quot;-tf:$(TargetFramework)&quot;" />
