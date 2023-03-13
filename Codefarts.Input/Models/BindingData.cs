@@ -16,7 +16,7 @@ namespace Codefarts.Input.Models
     /// <summary>
     /// Provides a class for binding information.
     /// </summary>
-  [Serializable]
+    [Serializable]
     public struct BindingData
     {
         /// <summary>
@@ -29,9 +29,9 @@ namespace Codefarts.Input.Models
         /// <param name="player">The player id.</param>
         public BindingData(string name, IInputSource inputSource, string source, float value, int player)
         {
-            this.Name = name;
-            this.InputSource = inputSource;
-            this.Source = source;
+            this.Name = !string.IsNullOrWhiteSpace(name) ? name : throw new ArgumentException(nameof(name));
+            this.InputSource = inputSource ?? throw new ArgumentNullException(nameof(inputSource));
+            this.Source = !string.IsNullOrWhiteSpace(source) ? source : throw new ArgumentException(nameof(source));
             this.Player = player;
             this.Value = value;
             this.PreviousValue = 0;
